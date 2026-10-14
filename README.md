@@ -51,6 +51,15 @@ first time it loads. After that, the app opens and runs with no connection. On a
 use "Add to Home Screen" to install it like an app. Offline mode needs the app to be served over HTTPS (or from
 `localhost`), and it is turned off in `npm run dev`. Use `npm run build && npm run preview` to try it.
 
+## Hosting on GitHub Pages
+
+`.github/workflows/deploy.yml` builds the app, runs the tests, and publishes it to GitHub Pages on every push
+to `main`. You can also run it by hand from the Actions tab. One-time setup: in the repo's **Settings → Pages**,
+set **Source** to **GitHub Actions**. The app is then at `https://<user>.github.io/Spin/`.
+
+To use it on a phone, open that address once in the browser while online, then (on iPhone) tap
+Share → **Add to Home Screen**. After that it works offline.
+
 ## Development
 
 ```bash
