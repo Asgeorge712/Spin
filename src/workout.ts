@@ -1,5 +1,5 @@
-export const MIN_RESISTANCE = 1;
-export const MAX_RESISTANCE = 10;
+export const MIN_RESISTANCE = 0;
+export const MAX_RESISTANCE = 100;
 export const MIN_DURATION_SEC = 5;
 export const MAX_DURATION_SEC = 60 * 60;
 
@@ -36,7 +36,7 @@ export function createSet(overrides: Partial<SpinSet> = {}): SpinSet {
     id: newId(),
     label: "Steady",
     durationSec: 60,
-    resistance: 4,
+    resistance: 40,
     position: "seated",
     ...overrides,
   };
@@ -120,24 +120,13 @@ export function rideStateAt(sets: SpinSet[], elapsedSec: number): RideState | nu
   return { index: last, set: sets[last], remainingInSet: 0, remainingTotal: 0, done: true };
 }
 
-export function presetWorkouts(): Workout[] {
-  return [
-    createWorkout("20-min Intervals", [
-      createSet({ label: "Warm-up", durationSec: 180, resistance: 3, cadence: 85 }),
-      ...Array.from({ length: 6 }, (_, i) => [
-        createSet({ label: `Push ${i + 1}`, durationSec: 60, resistance: 8, position: "standing", cadence: 70 }),
-        createSet({ label: "Recover", durationSec: 90, resistance: 3, cadence: 90 }),
-      ]).flat(),
-      createSet({ label: "Cool-down", durationSec: 120, resistance: 2, cadence: 80 }),
-    ]),
-    createWorkout("Hill Climb", [
-      createSet({ label: "Warm-up", durationSec: 240, resistance: 3, cadence: 90 }),
-      createSet({ label: "Base", durationSec: 120, resistance: 5, cadence: 80 }),
-      createSet({ label: "Climb", durationSec: 120, resistance: 6, cadence: 75 }),
-      createSet({ label: "Steeper", durationSec: 120, resistance: 7, cadence: 70 }),
-      createSet({ label: "Summit", durationSec: 90, resistance: 9, position: "standing", cadence: 60 }),
-      createSet({ label: "Descent", durationSec: 180, resistance: 3, cadence: 95 }),
-      createSet({ label: "Cool-down", durationSec: 180, resistance: 2, cadence: 80 }),
-    ]),
-  ];
+/** Name for the copy made when resistance is changed mid-ride. */
+export function rideCopyName(name: string, when: Date): string {
+  const stamp = when.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  return `${name} (ride ${stamp})`;
 }

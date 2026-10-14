@@ -324,3 +324,52 @@ button.danger {
   padding: 12px 20px;
   min-width: 100px;
 }
+
+.files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.files p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+}
+
+.files-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ride-current {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ride-current.dragging .ride-resistance strong {
+  transform: scale(1.15);
+}
+
+.ride-resistance strong {
+  display: inline-block;
+  transition: transform 0.1s;
+}
+
+.ride-hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.ride-notice {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}

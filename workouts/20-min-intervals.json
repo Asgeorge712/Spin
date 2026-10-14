@@ -1,0 +1,21 @@
+{
+  "format": "spin-workout",
+  "version": 1,
+  "name": "20-min Intervals",
+  "sets": [
+    { "label": "Warm-up", "duration": "3:00", "resistance": 30, "position": "seated", "cadence": 85 },
+    { "label": "Push 1", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
+    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
+    { "label": "Push 2", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
+    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
+    { "label": "Push 3", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
+    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
+    { "label": "Push 4", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
+    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
+    { "label": "Push 5", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
+    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
+    { "label": "Push 6", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
+    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
+    { "label": "Cool-down", "duration": "2:00", "resistance": 20, "position": "seated", "cadence": 80 }
+  ]
+}

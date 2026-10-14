@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import { MAX_RESISTANCE, formatDuration, rideStateAt, type Workout } from "../workout";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { MAX_RESISTANCE, MIN_RESISTANCE, clamp, formatDuration, rideStateAt, type Workout } from "../workout";
 import { resistanceColor } from "./colors";
 import { ProfileChart } from "./ProfileChart";
+
+/** Pixels of vertical finger movement per resistance point. */
+const PX_PER_POINT = 3;
 
 function beep() {
   try {
@@ -17,12 +20,56 @@ function beep() {
   }
 }
 
-export function RideMode({ workout, onExit }: { workout: Workout; onExit: () => void }) {
+const isTouchScreen = () =>
+  typeof window !== "undefined" && (matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0);
+
+/** Keeps the screen awake while `active`, where the browser supports it. */
+function useWakeLock(active: boolean) {
+  useEffect(() => {
+    if (!active || !("wakeLock" in navigator)) return;
+    let lock: WakeLockSentinel | null = null;
+    let cancelled = false;
+    const acquire = () => {
+      navigator.wakeLock
+        .request("screen")
+        .then((l) => {
+          if (cancelled) void l.release();
+          else lock = l;
+        })
+        .catch(() => {});
+    };
+    // The lock is dropped when the tab is hidden; take it again on return.
+    const onVisible = () => document.visibilityState === "visible" && acquire();
+    acquire();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      cancelled = true;
+      document.removeEventListener("visibilitychange", onVisible);
+      lock?.release().catch(() => {});
+    };
+  }, [active]);
+}
+
+interface Props {
+  workout: Workout;
+  onExit: () => void;
+  /** Called when the rider drags a set's resistance to a new value. */
+  onResistanceChange: (setIndex: number, resistance: number) => void;
+  /** Set once mid-ride changes have been saved as a new workout. */
+  savedAsNew: boolean;
+}
+
+export function RideMode({ workout, onExit, onResistanceChange, savedAsNew }: Props) {
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);
   const lastIndex = useRef(0);
   // performance.now() value corresponding to elapsed = 0 while running.
   const anchor = useRef(0);
+  const drag = useRef<{ pointerId: number; startY: number; startValue: number; value: number; setIndex: number } | null>(null);
+  const [dragValue, setDragValue] = useState<number | null>(null);
+  const [touch] = useState(isTouchScreen);
+
+  useWakeLock(running);
 
   const state = rideStateAt(workout.sets, elapsed);
 
@@ -60,6 +107,33 @@ export function RideMode({ workout, onExit }: { workout: Workout; onExit: () => 
     seek(start);
   };
 
+  // Touch drag on the current-set card: up raises resistance, down lowers it.
+  // The value is committed on release, against the set the drag started on.
+  const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === "mouse" || drag.current) return;
+    drag.current = { pointerId: e.pointerId, startY: e.clientY, startValue: set.resistance, value: set.resistance, setIndex: state.index };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.pointerId) return;
+    const delta = Math.round((d.startY - e.clientY) / PX_PER_POINT);
+    d.value = clamp(d.startValue + delta, MIN_RESISTANCE, MAX_RESISTANCE);
+    setDragValue(d.value);
+  };
+
+  const endDrag = (e: PointerEvent<HTMLDivElement>, commit: boolean) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.pointerId) return;
+    if (commit && d.value !== d.startValue) onResistanceChange(d.setIndex, d.value);
+    drag.current = null;
+    setDragValue(null);
+  };
+
+  const shownResistance = dragValue ?? set.resistance;
+  const dragging = dragValue !== null;
+
   return (
     <div className="ride">
       <header className="ride-header">
@@ -70,6 +144,8 @@ export function RideMode({ workout, onExit }: { workout: Workout; onExit: () => 
         <span className="muted">{formatDuration(state.remainingTotal)} left</span>
       </header>
 
+      {savedAsNew && <div className="ride-notice">Your changes are being saved as this new workout.</div>}
+
       {state.done ? (
         <div className="ride-done">
           <h3>Workout complete 🎉</h3>
@@ -78,16 +154,23 @@ export function RideMode({ workout, onExit }: { workout: Workout; onExit: () => 
           </button>
         </div>
       ) : (
-        <div className="ride-current" style={{ borderColor: resistanceColor(set.resistance) }}>
+        <div
+          className={`ride-current${dragging ? " dragging" : ""}`}
+          style={{ borderColor: resistanceColor(shownResistance) }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={(e) => endDrag(e, true)}
+          onPointerCancel={(e) => endDrag(e, false)}
+        >
           <div className="ride-label">
             Set {state.index + 1} of {workout.sets.length} · {set.label}
           </div>
           <div className="ride-timer">{formatDuration(state.remainingInSet)}</div>
           <div className="ride-stats">
-            <div>
+            <div className="ride-resistance">
               <span>Resistance</span>
-              <strong style={{ color: resistanceColor(set.resistance) }}>
-                {set.resistance}
+              <strong style={{ color: resistanceColor(shownResistance) }}>
+                {shownResistance}
                 <small>/{MAX_RESISTANCE}</small>
               </strong>
             </div>
@@ -100,6 +183,7 @@ export function RideMode({ workout, onExit }: { workout: Workout; onExit: () => 
               <strong>{set.cadence ? `${set.cadence}` : "—"}</strong>
             </div>
           </div>
+          {touch && <div className="ride-hint">Drag up or down to change resistance</div>}
           {next && (
             <div className="ride-next">
               Next: {next.label} · {formatDuration(next.durationSec)} @ {next.resistance}

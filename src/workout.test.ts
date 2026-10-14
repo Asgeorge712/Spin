@@ -28,8 +28,8 @@ describe("duration helpers", () => {
 
 describe("workout math", () => {
   const sets = [
-    createSet({ durationSec: 60, resistance: 2 }),
-    createSet({ durationSec: 120, resistance: 8 }),
+    createSet({ durationSec: 60, resistance: 20 }),
+    createSet({ durationSec: 120, resistance: 80 }),
   ];
 
   it("totals duration", () => {
@@ -37,14 +37,14 @@ describe("workout math", () => {
   });
 
   it("time-weights average resistance", () => {
-    expect(averageResistance(sets)).toBe(6);
+    expect(averageResistance(sets)).toBe(60);
     expect(averageResistance([])).toBe(0);
   });
 
   it("clamps out-of-range values", () => {
-    const s = normalizeSet(createSet({ durationSec: 1, resistance: 99 }));
+    const s = normalizeSet(createSet({ durationSec: 1, resistance: 150 }));
     expect(s.durationSec).toBe(5);
-    expect(s.resistance).toBe(10);
+    expect(s.resistance).toBe(100);
   });
 });
 

@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { ProfileChart } from "./components/ProfileChart";
 import { RideMode } from "./components/RideMode";
 import { SetList } from "./components/SetList";
+import { configFileName, parseConfigFile, toConfigFile } from "./configFile";
 import { loadWorkouts, saveWorkouts } from "./storage";
 import {
   averageResistance,
@@ -9,7 +10,8 @@ import {
   createWorkout,
   formatDuration,
   newId,
-  presetWorkouts,
+  normalizeSet,
+  rideCopyName,
   totalDuration,
   type SpinSet,
   type Workout,
@@ -17,13 +19,26 @@ import {
 
 function initialWorkouts(): Workout[] {
   const saved = loadWorkouts();
-  return saved.length > 0 ? saved : presetWorkouts();
+  return saved.length > 0 ? saved : [createWorkout()];
+}
+
+function downloadJson(fileName: string, data: unknown) {
+  const blob = new Blob([JSON.stringify(data, null, 2) + "\n"], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 export default function App() {
   const [workouts, setWorkouts] = useState<Workout[]>(initialWorkouts);
   const [activeId, setActiveId] = useState(() => workouts[0].id);
   const [riding, setRiding] = useState(false);
+  // The copy created by changing resistance during the current ride, if any.
+  const [rideCopyId, setRideCopyId] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => saveWorkouts(workouts), [workouts]);
 
@@ -48,23 +63,19 @@ export default function App() {
     setSets([...active.sets, createSet(last ? { resistance: last.resistance, durationSec: last.durationSec } : {})]);
   };
 
-  const addWorkout = () => {
-    const w = createWorkout(`Workout ${workouts.length + 1}`);
-    setWorkouts((ws) => [...ws, w]);
-    setActiveId(w.id);
+  const addWorkouts = (added: Workout[]) => {
+    if (added.length === 0) return;
+    setWorkouts((ws) => [...ws, ...added]);
+    setActiveId(added[added.length - 1].id);
   };
 
-  const duplicateWorkout = () => {
-    const copy: Workout = {
-      ...active,
-      id: newId(),
-      name: `${active.name} (copy)`,
-      sets: active.sets.map((s) => ({ ...s, id: newId() })),
-      updatedAt: Date.now(),
-    };
-    setWorkouts((ws) => [...ws, copy]);
-    setActiveId(copy.id);
-  };
+  const copyOf = (w: Workout, name: string): Workout => ({
+    ...w,
+    id: newId(),
+    name,
+    sets: w.sets.map((s) => ({ ...s, id: newId() })),
+    updatedAt: Date.now(),
+  });
 
   const deleteWorkout = () => {
     if (!confirm(`Delete "${active.name}"?`)) return;
@@ -74,10 +85,49 @@ export default function App() {
     setActiveId(next[0].id);
   };
 
+  const importFiles = async (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    const imported: Workout[] = [];
+    const errors: string[] = [];
+    for (const file of files) {
+      try {
+        imported.push(parseConfigFile(JSON.parse(await file.text()), file.name.replace(/\.json$/i, "")));
+      } catch (err) {
+        errors.push(`${file.name}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+    addWorkouts(imported);
+    if (errors.length > 0) alert(`Some files couldn't be imported:\n\n${errors.join("\n")}`);
+  };
+
+  const startRide = () => {
+    setRideCopyId(null);
+    setRiding(true);
+  };
+
+  // The first resistance change in a ride saves a new workout with the new
+  // numbers and switches the ride over to it; later changes update that copy.
+  const changeRideResistance = (setIndex: number, resistance: number) => {
+    const sets = active.sets.map((s, i) => (i === setIndex ? normalizeSet({ ...s, resistance }) : s));
+    if (rideCopyId === active.id) {
+      patchActive({ sets });
+      return;
+    }
+    const copy = { ...copyOf(active, rideCopyName(active.name, new Date())), sets };
+    addWorkouts([copy]);
+    setRideCopyId(copy.id);
+  };
+
   if (riding && active.sets.length > 0) {
     return (
       <main className="app">
-        <RideMode workout={active} onExit={() => setRiding(false)} />
+        <RideMode
+          workout={active}
+          onExit={() => setRiding(false)}
+          onResistanceChange={changeRideResistance}
+          savedAsNew={rideCopyId === active.id}
+        />
       </main>
     );
   }
@@ -94,10 +144,10 @@ export default function App() {
               </option>
             ))}
           </select>
-          <button type="button" onClick={addWorkout}>
+          <button type="button" onClick={() => addWorkouts([createWorkout(`Workout ${workouts.length + 1}`)])}>
             + New
           </button>
-          <button type="button" onClick={duplicateWorkout}>
+          <button type="button" onClick={() => addWorkouts([copyOf(active, `${active.name} (copy)`)])}>
             Duplicate
           </button>
           <button type="button" className="danger" onClick={deleteWorkout}>
@@ -124,7 +174,7 @@ export default function App() {
           </div>
           <div>
             <span>Avg resistance</span>
-            <strong>{stats.avg.toFixed(1)}</strong>
+            <strong>{Math.round(stats.avg)}</strong>
           </div>
           <div>
             <span>Peak</span>
@@ -132,12 +182,7 @@ export default function App() {
           </div>
         </div>
         <ProfileChart sets={active.sets} />
-        <button
-          type="button"
-          className="primary ride-button"
-          disabled={active.sets.length === 0}
-          onClick={() => setRiding(true)}
-        >
+        <button type="button" className="primary ride-button" disabled={active.sets.length === 0} onClick={startRide}>
           ▶ Ride this workout
         </button>
       </section>
@@ -147,6 +192,31 @@ export default function App() {
         <button type="button" className="add-set" onClick={addSet}>
           + Add set
         </button>
+      </section>
+
+      <section className="card files">
+        <div>
+          <strong>Workout files</strong>
+          <p className="muted">
+            Save this workout as a <code>.json</code> config file, or load workout files from your device.
+          </p>
+        </div>
+        <div className="files-actions">
+          <button type="button" onClick={() => downloadJson(configFileName(active), toConfigFile(active))}>
+            ⬇ Export this workout
+          </button>
+          <button type="button" onClick={() => fileInput.current?.click()}>
+            ⬆ Import files…
+          </button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept=".json,application/json"
+            multiple
+            hidden
+            onChange={importFiles}
+          />
+        </div>
       </section>
     </main>
   );

@@ -26,7 +26,8 @@ export function ProfileChart({ sets, elapsedSec, height = 140 }: Props) {
     >
       {sets.map((s) => {
         const w = (s.durationSec / total) * WIDTH;
-        const h = (s.resistance / MAX_RESISTANCE) * (height - 4);
+        // Keep zero-resistance sets visible as a thin bar.
+        const h = Math.max((s.resistance / MAX_RESISTANCE) * (height - 4), 2);
         const rect = (
           <rect
             key={s.id}
