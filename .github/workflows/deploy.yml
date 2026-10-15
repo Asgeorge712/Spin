@@ -3,6 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    # Workout files are saved here by the app's sync and read straight from
+    # the repo, so saving one doesn't need a redeploy.
+    paths-ignore:
+      - "workouts/**"
   workflow_dispatch:
 
 permissions:

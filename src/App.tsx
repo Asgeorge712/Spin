@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { ProfileChart } from "./components/ProfileChart";
 import { RideMode } from "./components/RideMode";
 import { SetList } from "./components/SetList";
+import { SyncBadge, SyncPanel } from "./components/SyncPanel";
 import { configFileName, parseConfigFile, toConfigFile } from "./configFile";
-import { loadWorkouts, saveWorkouts } from "./storage";
+import { loadDeleted, loadWorkouts, saveDeleted, saveWorkouts } from "./storage";
+import type { SyncState } from "./sync/sync";
+import { useSync } from "./sync/useSync";
 import {
   averageResistance,
   createSet,
@@ -17,11 +20,6 @@ import {
   type Workout,
 } from "./workout";
 
-function initialWorkouts(): Workout[] {
-  const saved = loadWorkouts();
-  return saved.length > 0 ? saved : [createWorkout()];
-}
-
 function downloadJson(fileName: string, data: unknown) {
   const blob = new Blob([JSON.stringify(data, null, 2) + "\n"], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -32,36 +30,50 @@ function downloadJson(fileName: string, data: unknown) {
   URL.revokeObjectURL(url);
 }
 
+/** A new, unsynced copy of a workout. */
+function copyOf(w: Workout, name: string): Workout {
+  return {
+    ...w,
+    id: newId(),
+    name,
+    sets: w.sets.map((s) => ({ ...s, id: newId() })),
+    updatedAt: Date.now(),
+    file: undefined,
+    sha: undefined,
+    dirty: true,
+  };
+}
+
 export default function App() {
-  const [workouts, setWorkouts] = useState<Workout[]>(initialWorkouts);
-  const [activeId, setActiveId] = useState(() => workouts[0].id);
+  const [library, setLibrary] = useState<SyncState>(() => ({ workouts: loadWorkouts(), deleted: loadDeleted() }));
+  const { workouts } = library;
+  const [activeId, setActiveId] = useState<string | null>(() => workouts[0]?.id ?? null);
   const [riding, setRiding] = useState(false);
   // The copy created by changing resistance during the current ride, if any.
   const [rideCopyId, setRideCopyId] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
-  useEffect(() => saveWorkouts(workouts), [workouts]);
+  useEffect(() => saveWorkouts(library.workouts), [library.workouts]);
+  useEffect(() => saveDeleted(library.deleted), [library.deleted]);
 
-  const active = workouts.find((w) => w.id === activeId) ?? workouts[0];
+  const sync = useSync(library, setLibrary);
 
-  const stats = useMemo(
-    () => ({
-      total: totalDuration(active.sets),
-      avg: averageResistance(active.sets),
-      peak: Math.max(0, ...active.sets.map((s) => s.resistance)),
-    }),
-    [active.sets],
+  const setWorkouts = useCallback(
+    (update: (ws: Workout[]) => Workout[]) => setLibrary((lib) => ({ ...lib, workouts: update(lib.workouts) })),
+    [],
   );
 
-  const patchActive = (patch: Partial<Workout>) =>
-    setWorkouts((ws) => ws.map((w) => (w.id === active.id ? { ...w, ...patch, updatedAt: Date.now() } : w)));
+  const active: Workout | undefined = workouts.find((w) => w.id === activeId) ?? workouts[0];
 
-  const setSets = (sets: SpinSet[]) => patchActive({ sets });
-
-  const addSet = () => {
-    const last = active.sets[active.sets.length - 1];
-    setSets([...active.sets, createSet(last ? { resistance: last.resistance, durationSec: last.durationSec } : {})]);
-  };
+  const stats = useMemo(
+    () =>
+      active && {
+        total: totalDuration(active.sets),
+        avg: averageResistance(active.sets),
+        peak: Math.max(0, ...active.sets.map((s) => s.resistance)),
+      },
+    [active],
+  );
 
   const addWorkouts = (added: Workout[]) => {
     if (added.length === 0) return;
@@ -69,21 +81,7 @@ export default function App() {
     setActiveId(added[added.length - 1].id);
   };
 
-  const copyOf = (w: Workout, name: string): Workout => ({
-    ...w,
-    id: newId(),
-    name,
-    sets: w.sets.map((s) => ({ ...s, id: newId() })),
-    updatedAt: Date.now(),
-  });
-
-  const deleteWorkout = () => {
-    if (!confirm(`Delete "${active.name}"?`)) return;
-    const remaining = workouts.filter((w) => w.id !== active.id);
-    const next = remaining.length > 0 ? remaining : [createWorkout()];
-    setWorkouts(next);
-    setActiveId(next[0].id);
-  };
+  const newWorkout = () => addWorkouts([{ ...createWorkout(`Workout ${workouts.length + 1}`), dirty: true }]);
 
   const importFiles = async (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -92,13 +90,65 @@ export default function App() {
     const errors: string[] = [];
     for (const file of files) {
       try {
-        imported.push(parseConfigFile(JSON.parse(await file.text()), file.name.replace(/\.json$/i, "")));
+        const w = parseConfigFile(JSON.parse(await file.text()), file.name.replace(/\.json$/i, ""));
+        imported.push({ ...w, dirty: true });
       } catch (err) {
         errors.push(`${file.name}: ${err instanceof Error ? err.message : String(err)}`);
       }
     }
     addWorkouts(imported);
     if (errors.length > 0) alert(`Some files couldn't be imported:\n\n${errors.join("\n")}`);
+  };
+
+  const importButton = (
+    <>
+      <button type="button" onClick={() => fileInput.current?.click()}>
+        ⬆ Import files…
+      </button>
+      <input ref={fileInput} type="file" accept=".json,application/json" multiple hidden onChange={importFiles} />
+    </>
+  );
+
+  if (!active || !stats) {
+    return (
+      <main className="app">
+        <header className="app-header">
+          <h1>Spin Workout Builder</h1>
+          <SyncBadge sync={sync} />
+        </header>
+        <section className="card empty-library">
+          <p>No workouts yet.</p>
+          <div className="files-actions">
+            <button type="button" className="primary" onClick={newWorkout}>
+              + New workout
+            </button>
+            {importButton}
+          </div>
+        </section>
+        <SyncPanel sync={sync} />
+      </main>
+    );
+  }
+
+  const patchActive = (patch: Partial<Workout>) =>
+    setWorkouts((ws) =>
+      ws.map((w) => (w.id === active.id ? { ...w, ...patch, updatedAt: Date.now(), dirty: true } : w)),
+    );
+
+  const setSets = (sets: SpinSet[]) => patchActive({ sets });
+
+  const addSet = () => {
+    const last = active.sets[active.sets.length - 1];
+    setSets([...active.sets, createSet(last ? { resistance: last.resistance, durationSec: last.durationSec } : {})]);
+  };
+
+  const deleteWorkout = () => {
+    if (!confirm(`Delete "${active.name}"?${active.file ? " This also deletes it on your other devices." : ""}`)) return;
+    setLibrary((lib) => ({
+      workouts: lib.workouts.filter((w) => w.id !== active.id),
+      deleted: active.file ? [...lib.deleted, { file: active.file, sha: active.sha }] : lib.deleted,
+    }));
+    setActiveId(workouts.find((w) => w.id !== active.id)?.id ?? null);
   };
 
   const startRide = () => {
@@ -136,6 +186,7 @@ export default function App() {
     <main className="app">
       <header className="app-header">
         <h1>Spin Workout Builder</h1>
+        <SyncBadge sync={sync} />
         <div className="workout-picker">
           <select value={active.id} onChange={(e) => setActiveId(e.target.value)} aria-label="Workout">
             {workouts.map((w) => (
@@ -144,7 +195,7 @@ export default function App() {
               </option>
             ))}
           </select>
-          <button type="button" onClick={() => addWorkouts([createWorkout(`Workout ${workouts.length + 1}`)])}>
+          <button type="button" onClick={newWorkout}>
             + New
           </button>
           <button type="button" onClick={() => addWorkouts([copyOf(active, `${active.name} (copy)`)])}>
@@ -163,6 +214,7 @@ export default function App() {
           aria-label="Workout name"
           onChange={(e) => patchActive({ name: e.target.value })}
         />
+        {active.file && sync.config && <div className="muted file-name">{active.file}</div>}
         <div className="stats">
           <div>
             <span>Total time</span>
@@ -194,6 +246,8 @@ export default function App() {
         </button>
       </section>
 
+      <SyncPanel sync={sync} />
+
       <section className="card files">
         <div>
           <strong>Workout files</strong>
@@ -205,17 +259,7 @@ export default function App() {
           <button type="button" onClick={() => downloadJson(configFileName(active), toConfigFile(active))}>
             ⬇ Export this workout
           </button>
-          <button type="button" onClick={() => fileInput.current?.click()}>
-            ⬆ Import files…
-          </button>
-          <input
-            ref={fileInput}
-            type="file"
-            accept=".json,application/json"
-            multiple
-            hidden
-            onChange={importFiles}
-          />
+          {importButton}
         </div>
       </section>
     </main>

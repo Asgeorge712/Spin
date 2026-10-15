@@ -20,6 +20,18 @@ export interface Workout {
   name: string;
   sets: SpinSet[];
   updatedAt: number;
+  /** File name in the synced workouts/ folder, once it has one. */
+  file?: string;
+  /** Git blob SHA of the file as last synced. */
+  sha?: string;
+  /** Changed on this device since the last sync. */
+  dirty?: boolean;
+}
+
+/** A synced workout file that was deleted on this device and must be removed remotely. */
+export interface Tombstone {
+  file: string;
+  sha?: string;
 }
 
 export function newId(): string {
