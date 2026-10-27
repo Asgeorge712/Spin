@@ -30,11 +30,17 @@ self.addEventListener("fetch", (event) => {
   if (request.mode === "navigate") {
     // Pages: try the network for updates, fall back to the cached app offline.
     event.respondWith(
-      fetch(request).catch(() => caches.match("./index.html", { ignoreSearch: true }).then((r) => r || caches.match("./"))),
+      fetch(request).catch(() =>
+        caches
+          .match("./index.html", { ignoreSearch: true, ignoreVary: true })
+          .then((r) => r || caches.match("./", { ignoreVary: true })),
+      ),
     );
     return;
   }
 
   // Assets: serve from cache (they're content-hashed), else the network.
-  event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+  // ignoreVary: servers may send "Vary: Origin", and module scripts are requested
+  // with an Origin header the precache requests didn't have, so they'd never match.
+  event.respondWith(caches.match(request, { ignoreVary: true }).then((cached) => cached || fetch(request)));
 });

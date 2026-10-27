@@ -39,10 +39,30 @@ Each workout can be saved as a `.json` config file:
 `duration` takes `"m:ss"`, `"h:mm:ss"` or a number of seconds. `label`, `position` (default `seated`)
 and `cadence` are optional.
 
-- **Built-in workouts** are the files in [`workouts/`](workouts/). Add a `.json` file there and it shows up in the
-  app (on devices that already have the app, after its next update).
-- **On your device**, workouts are kept in the browser's storage. Use **Export this workout** to download one as a
+- **The files in [`workouts/`](workouts/)** are the shared library when sync is on (see below). Without sync, they
+  are the starting workouts bundled into the app.
+- **On each device**, workouts are also kept in the browser's storage, so the app works offline. Use **Export this workout** to download one as a
   `.json` file, and **Import files…** to load one or more `.json` files.
+
+## Syncing workouts across devices
+
+Connect the app to this GitHub repo (the **Sync with GitHub** panel) and every workout is saved as its own file in
+[`workouts/`](workouts/), shared by every device you connect: new workouts, edits, duplicates, deletions, and the
+copies made by dragging resistance mid-ride.
+
+- **Setup, once per device:** create a
+  [fine-grained token](https://github.com/settings/personal-access-tokens/new) with access to only this repo and
+  *Contents: Read and write*, then paste it into the panel. It is stored only in that browser.
+- **When it syncs:** when the app opens, a few seconds after a change, when the connection comes back, when the app
+  returns to the foreground, every 2 minutes, and on **Sync now**. Each change is a commit, so the repo history is a
+  full undo log.
+- **Offline:** everything keeps working; changes are saved on the device and sent the next time it's online.
+- **Conflicts:** if the same workout was changed on two devices before syncing, the version already on GitHub keeps
+  the file and the other is saved as a separate workout named `… (conflict <date>)`. Nothing is lost.
+- A workout keeps its file name when renamed.
+- Commits that only touch `workouts/` don't redeploy the site; the app reads them straight from the repo.
+
+The sync logic is in `src/sync/` (`sync.ts` is the algorithm, tested in `sync.test.ts` against a fake repo).
 
 ## Offline use
 
