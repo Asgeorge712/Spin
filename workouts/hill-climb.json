@@ -70,15 +70,15 @@
       "position": "seated"
     },
     {
-      "label": "Climb 8",
+      "label": "Steady",
       "duration": "4:00",
-      "resistance": 45,
+      "resistance": 50,
       "position": "seated"
     },
     {
-      "label": "Steady",
+      "label": "Climb 8",
       "duration": "4:00",
-      "resistance": 25,
+      "resistance": 45,
       "position": "seated"
     },
     {
