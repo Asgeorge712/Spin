@@ -1,24 +1,23 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react";
-import { MAX_RESISTANCE, MIN_RESISTANCE, clamp, formatDuration, rideStateAt, type Workout } from "../workout";
+import {
+  MAX_RESISTANCE,
+  MIN_RESISTANCE,
+  clamp,
+  formatDuration,
+  rideStateAt,
+  totalDuration,
+  type Workout,
+} from "../workout";
 import { resistanceColor } from "./colors";
 import { ProfileChart } from "./ProfileChart";
+import { finishChime, intervalBeep, unlockAudio, warningBeep } from "./sound";
 
 /** Pixels of vertical finger movement per resistance point. */
 const PX_PER_POINT = 3;
-
-function beep() {
-  try {
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    osc.frequency.value = 880;
-    osc.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.15);
-    osc.onended = () => ctx.close();
-  } catch {
-    // Audio is a nice-to-have.
-  }
-}
+/** Seconds before an interval ends to show the "change resistance" countdown. */
+const COUNTDOWN_SEC = 5;
+/** Seconds before an interval ends to start the warning beeps. */
+const BEEP_SEC = 3;
 
 const isTouchScreen = () =>
   typeof window !== "undefined" && (matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0);
@@ -63,6 +62,8 @@ export function RideMode({ workout, onExit, onResistanceChange, savedAsNew }: Pr
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);
   const lastIndex = useRef(0);
+  // The last "set:second" a warning beep played for, so a re-render doesn't repeat it.
+  const lastBeep = useRef("");
   // performance.now() value corresponding to elapsed = 0 while running.
   const anchor = useRef(0);
   const drag = useRef<{ pointerId: number; startY: number; startValue: number; value: number; setIndex: number } | null>(null);
@@ -90,12 +91,21 @@ export function RideMode({ workout, onExit, onResistanceChange, savedAsNew }: Pr
     if (!state) return;
     if (state.done) {
       setRunning(false);
-      beep();
-    } else if (state.index !== lastIndex.current) {
-      beep();
+      finishChime();
+    } else if (state.index !== lastIndex.current && running) {
+      intervalBeep();
     }
     lastIndex.current = state.index;
   }, [state?.index, state?.done]);
+
+  // Warning beeps in the last seconds of each interval.
+  useEffect(() => {
+    if (!running || !state || state.done || state.remainingInSet > BEEP_SEC) return;
+    const key = `${state.index}:${state.remainingInSet}`;
+    if (key === lastBeep.current) return;
+    lastBeep.current = key;
+    warningBeep();
+  }, [running, state?.index, state?.remainingInSet]);
 
   if (!state) return null;
   const { set, next } = state;
@@ -133,15 +143,23 @@ export function RideMode({ workout, onExit, onResistanceChange, savedAsNew }: Pr
 
   const shownResistance = dragValue ?? set.resistance;
   const dragging = dragValue !== null;
+  const countdown = !state.done && state.remainingInSet <= COUNTDOWN_SEC;
+  const countdownText = !next
+    ? "Last interval: almost done"
+    : next.resistance !== set.resistance
+      ? `Change resistance to ${next.resistance}`
+      : `Next: ${next.label}`;
+
+  const toggleRunning = () => {
+    // Taps are the only time iOS allows audio to be switched on.
+    unlockAudio();
+    setRunning((r) => !r);
+  };
 
   return (
     <div className="ride">
       <header className="ride-header">
-        <button type="button" onClick={onExit}>
-          ← Back to editor
-        </button>
         <h2>{workout.name}</h2>
-        <span className="muted">{formatDuration(state.remainingTotal)} left</span>
       </header>
 
       {savedAsNew && <div className="ride-notice">Your changes are being saved as this new workout.</div>}
@@ -149,13 +167,10 @@ export function RideMode({ workout, onExit, onResistanceChange, savedAsNew }: Pr
       {state.done ? (
         <div className="ride-done">
           <h3>Workout complete 🎉</h3>
-          <button type="button" className="primary" onClick={() => seek(0)}>
-            Ride again
-          </button>
         </div>
       ) : (
         <div
-          className={`ride-current${dragging ? " dragging" : ""}`}
+          className={`ride-current${dragging ? " dragging" : ""}${countdown ? " counting-down" : ""}`}
           style={{ borderColor: resistanceColor(shownResistance) }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -163,20 +178,43 @@ export function RideMode({ workout, onExit, onResistanceChange, savedAsNew }: Pr
           onPointerCancel={(e) => endDrag(e, false)}
         >
           <div className="ride-label">
-            Set {state.index + 1} of {workout.sets.length} · {set.label}
+            Set {state.index + 1} of {workout.sets.length} · {set.label} · Current Interval Time:{" "}
+            {formatDuration(set.durationSec)}
           </div>
-          <div className="ride-timer">{formatDuration(state.remainingInSet)}</div>
+          <div className="ride-clock">
+            <div className="ride-total ride-elapsed">
+              <span>Total Elapsed Time</span>
+              <strong>{formatDuration(totalDuration(workout.sets) - state.remainingTotal)}</strong>
+            </div>
+            {countdown ? (
+              <div className="ride-countdown" role="status">
+                <div
+                  className="ride-countdown-text"
+                  style={next ? { color: resistanceColor(next.resistance) } : undefined}
+                >
+                  {countdownText}
+                </div>
+                <div className="ride-timer">{state.remainingInSet}</div>
+              </div>
+            ) : (
+              <div className="ride-timer">{formatDuration(state.remainingInSet)}</div>
+            )}
+            <div className="ride-total ride-remaining">
+              <span>Total Time Remaining</span>
+              <strong>{formatDuration(state.remainingTotal)}</strong>
+            </div>
+          </div>
           <div className="ride-stats">
+            <div>
+              <span>Position</span>
+              <strong>{set.position === "standing" ? "Stand" : "Seated"}</strong>
+            </div>
             <div className="ride-resistance">
               <span>Resistance</span>
               <strong style={{ color: resistanceColor(shownResistance) }}>
                 {shownResistance}
                 <small>/{MAX_RESISTANCE}</small>
               </strong>
-            </div>
-            <div>
-              <span>Position</span>
-              <strong>{set.position === "standing" ? "Stand" : "Seated"}</strong>
             </div>
             <div>
               <span>Cadence</span>
@@ -198,9 +236,18 @@ export function RideMode({ workout, onExit, onResistanceChange, savedAsNew }: Pr
         <button type="button" onClick={() => skip(-1)}>
           ⏮ Prev
         </button>
-        <button type="button" className="primary" disabled={state.done} onClick={() => setRunning((r) => !r)}>
-          {running ? "Pause" : elapsed === 0 ? "Start" : "Resume"}
-        </button>
+        <div className="ride-main-control">
+          {!state.done && (
+            <button type="button" className="primary" onClick={toggleRunning}>
+              {running ? "Pause" : elapsed === 0 ? "Start" : "Resume"}
+            </button>
+          )}
+          {!running && (
+            <button type="button" className="ride-exit" onClick={onExit}>
+              ← Back to editor
+            </button>
+          )}
+        </div>
         <button type="button" onClick={() => skip(1)}>
           Next ⏭
         </button>

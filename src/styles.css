@@ -270,11 +270,8 @@ button.danger {
 
 /* Ride mode */
 .ride-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: space-between;
   margin-bottom: 16px;
+  text-align: center;
 }
 
 .ride-header h2 {
@@ -304,8 +301,93 @@ button.danger {
   line-height: 1.1;
 }
 
+/* Elapsed | set countdown | remaining */
+.ride-clock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+}
+
+.ride-total span {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.ride-total strong {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Phones: countdown on its own row, totals side by side under it. */
+@media (max-width: 600px) {
+  .ride-clock {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 4px;
+  }
+  .ride-clock > .ride-timer,
+  .ride-clock > .ride-countdown {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .ride-elapsed {
+    text-align: left;
+  }
+  .ride-remaining {
+    text-align: right;
+  }
+}
+
 .ride-stats strong {
   font-size: 2.25rem;
+}
+
+/* Position | Resistance | Cadence, with resistance always in the middle. */
+.ride-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 600px) {
+  .ride-stats strong {
+    font-size: 1.6rem;
+  }
+}
+
+/* "Change resistance to 45 … 5, 4, 3, 2, 1" in place of the timer. */
+.ride-countdown-text {
+  font-size: clamp(1.5rem, 4.5vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.ride-current.counting-down {
+  animation: countdown-pulse 1s ease-in-out infinite;
+}
+
+@keyframes countdown-pulse {
+  50% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ride-current.counting-down {
+    animation: none;
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+}
+
+.ride-done h3 {
+  margin: 0;
+  font-size: clamp(2.5rem, 9vw, 5.5rem);
+  line-height: 1.1;
+}
+
+.ride-done {
+  padding: 48px 16px;
 }
 
 .ride-stats small {
@@ -320,8 +402,24 @@ button.danger {
 .ride-controls {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   gap: 12px;
   margin-top: 16px;
+}
+
+/* Start/Pause/Resume, with "Back to editor" under it while not running. */
+.ride-main-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.ride-controls .ride-exit {
+  min-width: 0;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .ride-controls button {
