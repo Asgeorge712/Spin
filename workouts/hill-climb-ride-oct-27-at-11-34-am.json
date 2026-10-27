@@ -1,0 +1,85 @@
+{
+  "format": "spin-workout",
+  "version": 1,
+  "name": "Hill Climb (ride Oct 27 at 11:34 AM)",
+  "sets": [
+    {
+      "label": "Warm-up",
+      "duration": "4:00",
+      "resistance": 20,
+      "position": "seated"
+    },
+    {
+      "label": "Base",
+      "duration": "4:00",
+      "resistance": 30,
+      "position": "seated"
+    },
+    {
+      "label": "Climb 1",
+      "duration": "4:00",
+      "resistance": 35,
+      "position": "seated"
+    },
+    {
+      "label": "Climb 2",
+      "duration": "4:00",
+      "resistance": 40,
+      "position": "seated"
+    },
+    {
+      "label": "Climb 3",
+      "duration": "4:00",
+      "resistance": 45,
+      "position": "seated"
+    },
+    {
+      "label": "Break 1",
+      "duration": "4:00",
+      "resistance": 35,
+      "position": "seated"
+    },
+    {
+      "label": "Break 2",
+      "duration": "4:00",
+      "resistance": 30,
+      "position": "seated"
+    },
+    {
+      "label": "Climb 4",
+      "duration": "4:00",
+      "resistance": 35,
+      "position": "seated"
+    },
+    {
+      "label": "Climb 5",
+      "duration": "8:00",
+      "resistance": 42,
+      "position": "seated"
+    },
+    {
+      "label": "Climb 6",
+      "duration": "8:00",
+      "resistance": 45,
+      "position": "seated"
+    },
+    {
+      "label": "Climb 7",
+      "duration": "4:00",
+      "resistance": 47,
+      "position": "seated"
+    },
+    {
+      "label": "Climb 8",
+      "duration": "4:00",
+      "resistance": 45,
+      "position": "seated"
+    },
+    {
+      "label": "Cool-down",
+      "duration": "4:00",
+      "resistance": 30,
+      "position": "seated"
+    }
+  ]
+}
