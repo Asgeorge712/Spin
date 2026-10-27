@@ -1,0 +1,56 @@
+{
+  "format": "spin-workout",
+  "version": 1,
+  "name": "Hill Climb (conflict Oct 27 at 11:27 AM)",
+  "sets": [
+    {
+      "label": "Warm-up",
+      "duration": "4:00",
+      "resistance": 30,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Base",
+      "duration": "2:00",
+      "resistance": 50,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Climb",
+      "duration": "2:00",
+      "resistance": 60,
+      "position": "seated",
+      "cadence": 75
+    },
+    {
+      "label": "Steeper",
+      "duration": "2:00",
+      "resistance": 70,
+      "position": "seated",
+      "cadence": 70
+    },
+    {
+      "label": "Summit",
+      "duration": "1:30",
+      "resistance": 90,
+      "position": "standing",
+      "cadence": 60
+    },
+    {
+      "label": "Descent",
+      "duration": "3:00",
+      "resistance": 30,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Cool-down",
+      "duration": "3:00",
+      "resistance": 20,
+      "position": "seated",
+      "cadence": 80
+    }
+  ]
+}
