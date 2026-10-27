@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { readdirSync } from "node:fs";
 import { configFileName, parseConfigFile, toConfigFile } from "./configFile";
 import { builtinWorkouts } from "./storage";
 import { createSet, createWorkout } from "./workout";
@@ -34,8 +35,11 @@ describe("config files", () => {
   });
 
   it("loads every built-in workout file", () => {
+    // Sync adds files to workouts/, so compare with what's actually there.
+    const files = readdirSync(new URL("../workouts", import.meta.url)).filter((f) => f.endsWith(".json"));
     const builtins = builtinWorkouts();
-    expect(builtins.map((w) => w.id)).toEqual(["file:20-min-intervals", "file:hill-climb"]);
+    expect(builtins.map((w) => w.file).sort()).toEqual(files.sort());
+    expect(builtins.map((w) => w.id)).toContain("file:hill-climb");
     expect(builtins.every((w) => w.sets.length > 0)).toBe(true);
   });
 });
