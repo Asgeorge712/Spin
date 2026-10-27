@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react";
-import { MAX_RESISTANCE, MIN_RESISTANCE, clamp, formatDuration, rideStateAt, type Workout } from "../workout";
+import {
+  MAX_RESISTANCE,
+  MIN_RESISTANCE,
+  clamp,
+  formatDuration,
+  rideStateAt,
+  totalDuration,
+  type Workout,
+} from "../workout";
 import { resistanceColor } from "./colors";
 import { ProfileChart } from "./ProfileChart";
 
@@ -141,7 +149,6 @@ export function RideMode({ workout, onExit, onResistanceChange, savedAsNew }: Pr
           ← Back to editor
         </button>
         <h2>{workout.name}</h2>
-        <span className="muted">{formatDuration(state.remainingTotal)} left</span>
       </header>
 
       {savedAsNew && <div className="ride-notice">Your changes are being saved as this new workout.</div>}
@@ -165,7 +172,17 @@ export function RideMode({ workout, onExit, onResistanceChange, savedAsNew }: Pr
           <div className="ride-label">
             Set {state.index + 1} of {workout.sets.length} · {set.label}
           </div>
-          <div className="ride-timer">{formatDuration(state.remainingInSet)}</div>
+          <div className="ride-clock">
+            <div className="ride-total ride-elapsed">
+              <span>Total Elapsed Time</span>
+              <strong>{formatDuration(totalDuration(workout.sets) - state.remainingTotal)}</strong>
+            </div>
+            <div className="ride-timer">{formatDuration(state.remainingInSet)}</div>
+            <div className="ride-total ride-remaining">
+              <span>Total Time Remaining</span>
+              <strong>{formatDuration(state.remainingTotal)}</strong>
+            </div>
+          </div>
           <div className="ride-stats">
             <div className="ride-resistance">
               <span>Resistance</span>
