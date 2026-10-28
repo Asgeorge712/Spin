@@ -8,8 +8,19 @@ import { TodayView, WeekSchedule } from "./components/Schedule";
 import { SyncBadge, SyncPanel } from "./components/SyncPanel";
 import { configFileName, parseConfigFile, toConfigFile } from "./configFile";
 import { isLibraryRepo, mergeLibrary, type LibraryFile } from "./library";
-import { suggestedSchedule, type DayKey, type ScheduleState } from "./schedule";
-import { builtinWorkouts, loadDeleted, loadSchedule, loadWorkouts, saveDeleted, saveSchedule, saveWorkouts } from "./storage";
+import { localDate, suggestedSchedule, type DayKey, type ScheduleState } from "./schedule";
+import {
+  builtinWorkouts,
+  loadDeleted,
+  loadSchedule,
+  loadTodayPick,
+  loadWorkouts,
+  saveDeleted,
+  saveSchedule,
+  saveTodayPick,
+  saveWorkouts,
+  type TodayPick,
+} from "./storage";
 import type { SyncState } from "./sync/sync";
 import { useSync } from "./sync/useSync";
 import {
@@ -110,6 +121,13 @@ export default function App() {
       ) as ScheduleState["schedule"],
     }));
   }, [workouts, schedule.schedule]);
+
+  // A ride picked on the Today tab instead of the scheduled one. It only
+  // counts on the day it was picked, and doesn't change the weekly schedule.
+  const [todayPick, setTodayPick] = useState<TodayPick | null>(loadTodayPick);
+  useEffect(() => saveTodayPick(todayPick), [todayPick]);
+  const chosenToday = todayPick?.date === localDate() ? todayPick.key : null;
+  const chooseToday = (key: string | null) => setTodayPick(key ? { date: localDate(), key } : null);
 
   const setDay = (day: DayKey, key: string | null) =>
     setSchedule((s) => ({ ...s, dirty: true, schedule: { ...s.schedule, [day]: key } }));
@@ -284,7 +302,14 @@ export default function App() {
       </nav>
 
       {tab === "today" && (
-        <TodayView schedule={schedule.schedule} workouts={workouts} onRide={rideWorkout} onOpenWeek={() => goTab("week")} />
+        <TodayView
+          schedule={schedule.schedule}
+          workouts={workouts}
+          chosenKey={chosenToday}
+          onChoose={chooseToday}
+          onRide={rideWorkout}
+          onOpenWeek={() => goTab("week")}
+        />
       )}
 
       {tab === "week" && (

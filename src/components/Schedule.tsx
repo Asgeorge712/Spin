@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { DAYS, DAY_NAMES, findScheduled, todayKey, workoutKey, type DayKey, type Schedule } from "../schedule";
 import { formatDuration, totalDuration, type Workout } from "../workout";
 import { resistanceColor } from "./colors";
@@ -10,21 +9,26 @@ const peak = (w: Workout) => Math.max(0, ...w.sets.map((s) => s.resistance));
 export function TodayView({
   schedule,
   workouts,
+  chosenKey,
+  onChoose,
   onRide,
   onOpenWeek,
 }: {
   schedule: Schedule;
   workouts: Workout[];
+  /** A ride picked for today instead of the scheduled one, if any. */
+  chosenKey: string | null;
+  onChoose: (key: string | null) => void;
   onRide: (w: Workout) => void;
   onOpenWeek: () => void;
 }) {
   const now = new Date();
   const day = todayKey(now);
-  const key = schedule[day];
-  const workout = findScheduled(workouts, key);
+  const scheduledKey = schedule[day];
+  const scheduled = findScheduled(workouts, scheduledKey);
+  const chosen = findScheduled(workouts, chosenKey);
+  const workout = chosen ?? scheduled;
   const sorted = [...workouts].sort((a, b) => a.name.localeCompare(b.name));
-  const [pick, setPick] = useState("");
-  const picked = workouts.find((w) => w.id === pick) ?? sorted[0];
   const upcoming = [1, 2, 3].map((n) => DAYS[(DAYS.indexOf(day) + n) % 7]);
 
   return (
@@ -41,6 +45,7 @@ export function TodayView({
               <span className="week-peak" style={{ background: resistanceColor(peak(workout)) }}>
                 {peak(workout)}
               </span>
+              {chosen && <span className="today-changed">· changed for today</span>}
             </div>
             <ProfileChart sets={workout.sets} height={110} />
             <button type="button" className="primary today-start" onClick={() => onRide(workout)}>
@@ -49,21 +54,11 @@ export function TodayView({
           </>
         ) : (
           <>
-            <h2 className="today-name">{key ? "Today's ride isn't on this device" : "Rest day 😌"}</h2>
-            {sorted.length > 0 && (
-              <div className="today-anyway">
-                <span className="muted">{key ? "Pick something else:" : "Feel like riding anyway?"}</span>
-                <select aria-label="Ride to start" value={picked?.id} onChange={(e) => setPick(e.target.value)}>
-                  {sorted.map((w) => (
-                    <option key={w.id} value={w.id}>
-                      {w.name} · {formatDuration(totalDuration(w.sets))}
-                    </option>
-                  ))}
-                </select>
-                <button type="button" className="primary" onClick={() => picked && onRide(picked)}>
-                  ▶ Ride
-                </button>
-              </div>
+            <h2 className="today-name">{scheduledKey ? "Today's ride isn't on this device" : "Rest day 😌"}</h2>
+            {workouts.length > 0 && (
+              <p className="muted today-hint">
+                {scheduledKey ? "Pick another ride" : "Feel like riding anyway? Pick one"} from <strong>Today's ride</strong> below.
+              </p>
             )}
           </>
         )}
@@ -92,9 +87,24 @@ export function TodayView({
             );
           })}
         </ul>
-        <button type="button" className="link-button" onClick={onOpenWeek}>
-          See the whole week →
-        </button>
+        <div className="coming-up-actions">
+          <button type="button" className="link-button" onClick={onOpenWeek}>
+            See the whole week →
+          </button>
+          {workouts.length > 0 && (
+            <label className="today-picker">
+              <span>Today's ride:</span>
+              <select value={chosen ? workoutKey(chosen) : ""} onChange={(e) => onChoose(e.target.value || null)}>
+                <option value="">As scheduled ({scheduled ? scheduled.name : "Rest"})</option>
+                {sorted.map((w) => (
+                  <option key={w.id} value={workoutKey(w)}>
+                    {w.name} · {formatDuration(totalDuration(w.sets))}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
       </section>
     </>
   );

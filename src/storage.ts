@@ -9,6 +9,7 @@ const SEEN_BUILTINS_KEY = "spin.seenBuiltins.v1";
 const DELETED_KEY = "spin.deleted.v1";
 const SYNC_KEY = "spin.sync.v1";
 const SCHEDULE_KEY = "spin.schedule.v1";
+const TODAY_PICK_KEY = "spin.todayPick.v1";
 
 /** Workout config files shipped with the app, from the repo's workouts/ folder. */
 const builtinFiles = import.meta.glob<unknown>("../workouts/*.json", { eager: true, import: "default" });
@@ -142,4 +143,19 @@ export function loadSchedule(workouts: Workout[]): ScheduleState {
 
 export function saveSchedule(state: ScheduleState): void {
   writeJson(SCHEDULE_KEY, state);
+}
+
+/** A ride chosen on the Today tab instead of the scheduled one; only for that date. */
+export interface TodayPick {
+  date: string;
+  key: string;
+}
+
+export function loadTodayPick(): TodayPick | null {
+  const raw = readJson(TODAY_PICK_KEY) as Partial<TodayPick> | null;
+  return raw && typeof raw.date === "string" && typeof raw.key === "string" ? { date: raw.date, key: raw.key } : null;
+}
+
+export function saveTodayPick(pick: TodayPick | null): void {
+  writeJson(TODAY_PICK_KEY, pick);
 }
