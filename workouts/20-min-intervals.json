@@ -3,19 +3,173 @@
   "version": 1,
   "name": "20-min Intervals",
   "sets": [
-    { "label": "Warm-up", "duration": "3:00", "resistance": 30, "position": "seated", "cadence": 85 },
-    { "label": "Push 1", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
-    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
-    { "label": "Push 2", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
-    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
-    { "label": "Push 3", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
-    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
-    { "label": "Push 4", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
-    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
-    { "label": "Push 5", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
-    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
-    { "label": "Push 6", "duration": "1:00", "resistance": 80, "position": "standing", "cadence": 70 },
-    { "label": "Recover", "duration": "1:30", "resistance": 30, "position": "seated", "cadence": 90 },
-    { "label": "Cool-down", "duration": "2:00", "resistance": 20, "position": "seated", "cadence": 80 }
+    {
+      "label": "Warm-up 1",
+      "duration": "1:00",
+      "resistance": 20,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Warm-up 2",
+      "duration": "1:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Warm-up 3",
+      "duration": "1:00",
+      "resistance": 30,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Push 1",
+      "duration": "1:00",
+      "resistance": 55,
+      "position": "standing",
+      "cadence": 70
+    },
+    {
+      "label": "Recover",
+      "duration": "0:45",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Build",
+      "duration": "0:45",
+      "resistance": 35,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Push 2",
+      "duration": "1:00",
+      "resistance": 55,
+      "position": "standing",
+      "cadence": 70
+    },
+    {
+      "label": "Recover",
+      "duration": "0:45",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Build",
+      "duration": "0:45",
+      "resistance": 35,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Push 3",
+      "duration": "1:00",
+      "resistance": 55,
+      "position": "standing",
+      "cadence": 70
+    },
+    {
+      "label": "Recover",
+      "duration": "0:45",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Build",
+      "duration": "0:45",
+      "resistance": 35,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Push 4",
+      "duration": "1:00",
+      "resistance": 55,
+      "position": "standing",
+      "cadence": 70
+    },
+    {
+      "label": "Recover",
+      "duration": "0:45",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Build",
+      "duration": "0:45",
+      "resistance": 35,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Push 5",
+      "duration": "1:00",
+      "resistance": 55,
+      "position": "standing",
+      "cadence": 70
+    },
+    {
+      "label": "Recover",
+      "duration": "0:45",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Build",
+      "duration": "0:45",
+      "resistance": 35,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Push 6",
+      "duration": "1:00",
+      "resistance": 55,
+      "position": "standing",
+      "cadence": 70
+    },
+    {
+      "label": "Recover",
+      "duration": "0:45",
+      "resistance": 35,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Recover",
+      "duration": "0:45",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Cool-down 1",
+      "duration": "0:40",
+      "resistance": 20,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Cool-down 2",
+      "duration": "0:40",
+      "resistance": 15,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Cool-down 3",
+      "duration": "0:40",
+      "resistance": 10,
+      "position": "seated",
+      "cadence": 75
+    }
   ]
 }
