@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { isLibraryRepo } from "../library";
 import { SCHEDULE_FOLDER, type ScheduleState } from "../schedule";
 import { loadSyncConfig, saveSyncConfig } from "../storage";
 import { GitHubWorkoutRepo, SyncError, type SyncConfig } from "./github";
@@ -64,7 +65,10 @@ export function useSync(
       setStatus({ state: "syncing" });
       try {
         const snapshot = latest.current;
-        const outcome = await syncWorkouts(new GitHubWorkoutRepo(cfg), snapshot);
+        const outcome = await syncWorkouts(new GitHubWorkoutRepo(cfg), snapshot, new Date(), {
+          // Syncing to your own repo: Paul's rides you have here belong in it too.
+          uploadUnsynced: !isLibraryRepo(cfg.owner, cfg.repo),
+        });
         setState((current) => {
           const merged = mergeSyncResult(current, snapshot, outcome);
           // Edits made during the sync still need sending, so only mark the

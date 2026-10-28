@@ -700,3 +700,9 @@ button.danger {
 .ad-banner ins.adsbygoogle[data-ad-status="unfilled"] {
   display: none !important;
 }
+
+.library-result {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: var(--good);
+}

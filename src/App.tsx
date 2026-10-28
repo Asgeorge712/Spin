@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { AdBanner } from "./components/AdBanner";
+import { LibraryCard } from "./components/LibraryCard";
 import { ProfileChart } from "./components/ProfileChart";
 import { RideMode } from "./components/RideMode";
 import { SetList } from "./components/SetList";
 import { TodayBar, WeekSchedule } from "./components/Schedule";
 import { SyncBadge, SyncPanel } from "./components/SyncPanel";
 import { configFileName, parseConfigFile, toConfigFile } from "./configFile";
+import { isLibraryRepo, mergeLibrary, type LibraryFile } from "./library";
 import { suggestedSchedule, type DayKey, type ScheduleState } from "./schedule";
-import { loadDeleted, loadSchedule, loadWorkouts, saveDeleted, saveSchedule, saveWorkouts } from "./storage";
+import { builtinWorkouts, loadDeleted, loadSchedule, loadWorkouts, saveDeleted, saveSchedule, saveWorkouts } from "./storage";
 import type { SyncState } from "./sync/sync";
 import { useSync } from "./sync/useSync";
 import {
@@ -80,6 +82,19 @@ export default function App() {
     setSchedule((s) => ({ ...s, dirty: true, schedule: { ...s.schedule, [day]: key } }));
 
   const sync = useSync(library, setLibrary, schedule, setSchedule);
+
+  // "Get Paul's latest rides".
+  const libraryRef = useRef(library);
+  libraryRef.current = library;
+  const updateFromLibrary = (files: LibraryFile[]) => {
+    const builtinOrigins = new Map(builtinWorkouts().map((w) => [w.id, w.origin!]));
+    const merge = (lib: SyncState) => mergeLibrary(lib.workouts, files, new Set(lib.deleted.map((t) => t.file)), builtinOrigins);
+    // Merge into the newest workouts when applying, in case of edits during the download.
+    setLibrary((lib) => ({ ...lib, workouts: merge(lib).workouts }));
+    return merge(libraryRef.current);
+  };
+  // Synced to Paul's own repo: sync already keeps these rides up to date.
+  const showLibrary = !(sync.config && isLibraryRepo(sync.config.owner, sync.config.repo));
 
   const setWorkouts = useCallback(
     (update: (ws: Workout[]) => Workout[]) => setLibrary((lib) => ({ ...lib, workouts: update(lib.workouts) })),
@@ -285,6 +300,8 @@ export default function App() {
       />
 
       <SyncPanel sync={sync} />
+
+      {showLibrary && <LibraryCard onUpdate={updateFromLibrary} />}
 
       <section className="card files">
         <div>
