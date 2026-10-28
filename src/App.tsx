@@ -214,7 +214,9 @@ export default function App() {
   };
 
   const deleteWorkout = () => {
-    if (!confirm(`Delete "${active.name}"?${active.file ? " This also deletes it on your other devices." : ""}`)) return;
+    // Only a synced workout is removed from other devices (via the sync repo).
+    const elsewhere = active.file && sync.config ? " This also deletes it on your other devices." : "";
+    if (!confirm(`Delete "${active.name}"?${elsewhere}`)) return;
     setLibrary((lib) => ({
       workouts: lib.workouts.filter((w) => w.id !== active.id),
       deleted: active.file ? [...lib.deleted, { file: active.file, sha: active.sha }] : lib.deleted,
