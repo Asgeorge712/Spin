@@ -1,0 +1,63 @@
+{
+  "format": "spin-workout",
+  "version": 1,
+  "name": "Easy Spin 30",
+  "sets": [
+    {
+      "label": "Warm-up",
+      "duration": "3:00",
+      "resistance": 15,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Easy 1",
+      "duration": "5:00",
+      "resistance": 20,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Easy 2",
+      "duration": "5:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Spin-up 1",
+      "duration": "2:00",
+      "resistance": 22,
+      "position": "seated",
+      "cadence": 100
+    },
+    {
+      "label": "Easy 3",
+      "duration": "5:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Spin-up 2",
+      "duration": "2:00",
+      "resistance": 22,
+      "position": "seated",
+      "cadence": 100
+    },
+    {
+      "label": "Easy 4",
+      "duration": "4:00",
+      "resistance": 20,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Cool-down",
+      "duration": "4:00",
+      "resistance": 15,
+      "position": "seated",
+      "cadence": 85
+    }
+  ]
+}

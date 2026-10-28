@@ -1,0 +1,133 @@
+{
+  "format": "spin-workout",
+  "version": 1,
+  "name": "Pyramid 30",
+  "sets": [
+    {
+      "label": "Warm-up 1",
+      "duration": "2:00",
+      "resistance": 20,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Warm-up 2",
+      "duration": "1:00",
+      "resistance": 28,
+      "position": "seated",
+      "cadence": 88
+    },
+    {
+      "label": "Warm-up 3",
+      "duration": "1:00",
+      "resistance": 36,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Pyramid 1 min",
+      "duration": "1:00",
+      "resistance": 55,
+      "position": "standing",
+      "cadence": 65
+    },
+    {
+      "label": "Recover",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Pyramid 2 min",
+      "duration": "2:00",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Recover",
+      "duration": "1:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Pyramid 3 min",
+      "duration": "3:00",
+      "resistance": 48,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Recover",
+      "duration": "1:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Pyramid 4 min",
+      "duration": "4:00",
+      "resistance": 45,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Recover",
+      "duration": "2:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Pyramid 3 min",
+      "duration": "3:00",
+      "resistance": 48,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Recover",
+      "duration": "1:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Pyramid 2 min",
+      "duration": "2:00",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Recover",
+      "duration": "1:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Pyramid 1 min",
+      "duration": "1:00",
+      "resistance": 55,
+      "position": "standing",
+      "cadence": 65
+    },
+    {
+      "label": "Cool-down 1",
+      "duration": "1:30",
+      "resistance": 22,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Cool-down 2",
+      "duration": "1:00",
+      "resistance": 15,
+      "position": "seated",
+      "cadence": 80
+    }
+  ]
+}
