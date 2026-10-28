@@ -9,6 +9,10 @@ A workout is a list of **sets**, and each set has:
 - **Position** – seated or standing
 - **Cadence** – an optional target RPM
 
+The app opens on **Today**: today's ride from the weekly schedule, with its chart, a **Start ride** button and the
+next few days. The **Workouts** tab is the editor (plus the Ride Library, files and sync), and **Week** is the
+schedule. The tab is kept in the address (`#today`, `#workouts`, `#week`), so the back button moves between them.
+
 The editor shows the total time, the average and peak resistance, and a chart of the workout's resistance over time.
 **Ride mode** gives you a big countdown for each set, shows the resistance to dial in, beeps when a set changes,
 and keeps the screen awake while the timer runs.
@@ -44,16 +48,16 @@ and `cadence` are optional.
 - **On each device**, workouts are also kept in the browser's storage, so the app works offline. Use **Export this workout** to download one as a
   `.json` file, and **Import files…** to load one or more `.json` files.
 
-## Paul's rides (no account needed)
+## Ride Library (no account needed)
 
-Anyone can use the app without GitHub: workouts are saved in their browser. The **Paul's rides** card has a
-**Get Paul's latest rides** button that downloads the current `workouts/` folder from this public repo, with no
+Anyone can use the app without GitHub: workouts are saved in their browser. The **Ride Library** card has a
+**Check for new rides** button that downloads the current `workouts/` folder from this public repo, with no
 token (2 GitHub API calls, then the files from raw.githubusercontent.com at that commit). New rides are added, rides
 that came from the library and haven't been edited are updated, and the user's own workouts and edited rides are
 never changed. Each library ride remembers a fingerprint of the version it came from to tell whether it was edited.
 The card is hidden when sync is connected to this repo, since sync already keeps those rides current.
 
-People who want sync across their own devices can point **Sync with GitHub** at their own repo; Paul's rides they
+People who want sync across their own devices can point **Sync with GitHub** at their own repo; library rides they
 have are then uploaded there too.
 
 ## Weekly schedule

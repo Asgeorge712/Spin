@@ -66,7 +66,7 @@ export function useSync(
       try {
         const snapshot = latest.current;
         const outcome = await syncWorkouts(new GitHubWorkoutRepo(cfg), snapshot, new Date(), {
-          // Syncing to your own repo: Paul's rides you have here belong in it too.
+          // Syncing to your own repo: library rides you have here belong in it too.
           uploadUnsynced: !isLibraryRepo(cfg.owner, cfg.repo),
         });
         setState((current) => {

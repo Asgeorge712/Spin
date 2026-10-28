@@ -244,7 +244,7 @@ export function RideMode({ workout, onExit, onResistanceChange, savedAsNew }: Pr
           )}
           {!running && (
             <button type="button" className="ride-exit" onClick={onExit}>
-              ← Back to editor
+              ← Back
             </button>
           )}
         </div>

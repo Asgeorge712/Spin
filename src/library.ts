@@ -1,7 +1,7 @@
 import { parseConfigFile, toConfigFile } from "./configFile";
 import type { Workout } from "./workout";
 
-/** Paul's public ride library: the workouts/ folder of the app's own repo. */
+/** The public Ride Library: the workouts/ folder of the app's own repo. */
 export const LIBRARY = { owner: "Asgeorge712", repo: "Spin", branch: "main", folder: "workouts" };
 
 export function isLibraryRepo(owner: string, repo: string): boolean {
