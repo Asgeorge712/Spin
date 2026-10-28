@@ -562,11 +562,6 @@ button.danger {
   color: var(--warn);
 }
 
-.file-name {
-  font-size: 0.8rem;
-  font-family: ui-monospace, monospace;
-}
-
 .empty-library {
   text-align: center;
 }
