@@ -634,17 +634,42 @@ button.danger {
   font-size: 1.25rem;
 }
 
-.today-anyway {
+.today-changed {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.today-hint {
+  margin: 4px 0 0;
+}
+
+.coming-up-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  margin-top: 8px;
 }
 
-.today-anyway select {
+/* Beside the link when there's room, otherwise on its own line. */
+.today-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 280px;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.today-picker span {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.today-picker select {
+  min-width: 140px;
+  max-width: 320px;
   flex: 1;
-  min-width: 180px;
 }
 
 .coming-up ul {

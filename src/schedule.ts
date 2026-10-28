@@ -51,6 +51,12 @@ export function suggestedSchedule(workouts: Workout[]): Schedule {
   return Object.fromEntries(DAYS.map((d) => [d, SUGGESTED[d] && files.has(SUGGESTED[d]) ? SUGGESTED[d] : null])) as Schedule;
 }
 
+/** Today's date as YYYY-MM-DD in local time, for choices that only last a day. */
+export function localDate(now = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
 export function todayKey(now = new Date()): DayKey {
   // getDay(): 0 = Sunday.
   return DAYS[(now.getDay() + 6) % 7];
