@@ -2,9 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } f
 import { ProfileChart } from "./components/ProfileChart";
 import { RideMode } from "./components/RideMode";
 import { SetList } from "./components/SetList";
+import { TodayBar, WeekSchedule } from "./components/Schedule";
 import { SyncBadge, SyncPanel } from "./components/SyncPanel";
 import { configFileName, parseConfigFile, toConfigFile } from "./configFile";
-import { loadDeleted, loadWorkouts, saveDeleted, saveWorkouts } from "./storage";
+import { suggestedSchedule, type DayKey, type ScheduleState } from "./schedule";
+import { loadDeleted, loadSchedule, loadWorkouts, saveDeleted, saveSchedule, saveWorkouts } from "./storage";
 import type { SyncState } from "./sync/sync";
 import { useSync } from "./sync/useSync";
 import {
@@ -56,7 +58,27 @@ export default function App() {
   useEffect(() => saveWorkouts(library.workouts), [library.workouts]);
   useEffect(() => saveDeleted(library.deleted), [library.deleted]);
 
-  const sync = useSync(library, setLibrary);
+  const [schedule, setSchedule] = useState<ScheduleState>(() => loadSchedule(workouts));
+  useEffect(() => saveSchedule(schedule), [schedule]);
+
+  // A day set to a workout before it had a file refers to it by id; switch to
+  // the file name once sync gives it one, so other devices can find it.
+  useEffect(() => {
+    const byId = new Map(workouts.filter((w) => w.file).map((w) => [w.id, w.file!]));
+    if (!Object.values(schedule.schedule).some((k) => k && byId.has(k))) return;
+    setSchedule((s) => ({
+      ...s,
+      dirty: true,
+      schedule: Object.fromEntries(
+        Object.entries(s.schedule).map(([d, k]) => [d, (k && byId.get(k)) ?? k]),
+      ) as ScheduleState["schedule"],
+    }));
+  }, [workouts, schedule.schedule]);
+
+  const setDay = (day: DayKey, key: string | null) =>
+    setSchedule((s) => ({ ...s, dirty: true, schedule: { ...s.schedule, [day]: key } }));
+
+  const sync = useSync(library, setLibrary, schedule, setSchedule);
 
   const setWorkouts = useCallback(
     (update: (ws: Workout[]) => Workout[]) => setLibrary((lib) => ({ ...lib, workouts: update(lib.workouts) })),
@@ -151,6 +173,12 @@ export default function App() {
     setActiveId(workouts.find((w) => w.id !== active.id)?.id ?? null);
   };
 
+  const rideWorkout = (w: Workout) => {
+    setActiveId(w.id);
+    setRideCopyId(null);
+    setRiding(true);
+  };
+
   const startRide = () => {
     setRideCopyId(null);
     setRiding(true);
@@ -207,6 +235,8 @@ export default function App() {
         </div>
       </header>
 
+      <TodayBar schedule={schedule.schedule} workouts={workouts} onRide={rideWorkout} />
+
       <section className="card">
         <input
           className="workout-name"
@@ -245,6 +275,13 @@ export default function App() {
           + Add set
         </button>
       </section>
+
+      <WeekSchedule
+        schedule={schedule.schedule}
+        workouts={workouts}
+        onChange={setDay}
+        onUseSuggested={() => setSchedule((s) => ({ ...s, dirty: true, schedule: suggestedSchedule(workouts) }))}
+      />
 
       <SyncPanel sync={sync} />
 

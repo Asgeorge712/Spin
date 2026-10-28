@@ -44,6 +44,13 @@ and `cadence` are optional.
 - **On each device**, workouts are also kept in the browser's storage, so the app works offline. Use **Export this workout** to download one as a
   `.json` file, and **Import files…** to load one or more `.json` files.
 
+## Weekly schedule
+
+The **This week** card assigns a ride (or Rest) to each day, and the **Today** bar at the top shows today's ride
+with a button that starts it. It starts as a suggested 80/20 week (mostly easy and endurance riding, two hard
+days apart); **Use the suggested week** resets it. With sync on, the schedule is saved to `schedule/week.json`
+and shared by every device; the last device to change it wins.
+
 ## Syncing workouts across devices
 
 Connect the app to this GitHub repo (the **Sync with GitHub** panel) and every workout is saved as its own file in

@@ -574,3 +574,118 @@ button.danger {
 .empty-library .files-actions {
   justify-content: center;
 }
+
+/* Weekly schedule */
+.today {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  border-left: 6px solid var(--accent);
+}
+
+.today-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.today-day {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.today-text strong {
+  font-size: 1.15rem;
+}
+
+.today .primary {
+  padding: 10px 20px;
+}
+
+.today-edit,
+.week a {
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+
+.week p {
+  margin: 4px 0 12px;
+  font-size: 0.9rem;
+}
+
+.week-days {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.week-days li {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr) 90px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+.week-days li.is-today {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.week-day {
+  font-weight: 600;
+}
+
+.week-today-tag {
+  margin-left: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.week-days select {
+  width: 100%;
+}
+
+.week-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.week-peak {
+  min-width: 26px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.week-suggest {
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .week-days li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .week-days select {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
