@@ -297,7 +297,10 @@ export default function App() {
       {tab === "workouts" && (
         <>
           <div className="workout-picker">
-            <select value={active.id} onChange={(e) => setActiveId(e.target.value)} aria-label="Workout">
+            <label className="picker-label" htmlFor="workout-select">
+              Select Workout:
+            </label>
+            <select id="workout-select" value={active.id} onChange={(e) => setActiveId(e.target.value)}>
               {workouts.map((w) => (
                 <option key={w.id} value={w.id}>
                   {w.name}
