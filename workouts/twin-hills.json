@@ -1,0 +1,133 @@
+{
+  "format": "spin-workout",
+  "version": 1,
+  "name": "Twin Hills",
+  "sets": [
+    {
+      "label": "Warm-up",
+      "duration": "5:00",
+      "resistance": 20,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Warm-up Build",
+      "duration": "3:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Flat Road",
+      "duration": "3:00",
+      "resistance": 30,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Foothills 1",
+      "duration": "4:00",
+      "resistance": 35,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Climb 1",
+      "duration": "4:00",
+      "resistance": 42,
+      "position": "seated",
+      "cadence": 72
+    },
+    {
+      "label": "Steeper 1",
+      "duration": "4:00",
+      "resistance": 48,
+      "position": "seated",
+      "cadence": 68
+    },
+    {
+      "label": "Summit 1",
+      "duration": "2:00",
+      "resistance": 55,
+      "position": "standing",
+      "cadence": 62
+    },
+    {
+      "label": "Peak 1",
+      "duration": "1:00",
+      "resistance": 58,
+      "position": "standing",
+      "cadence": 58
+    },
+    {
+      "label": "Descent 1",
+      "duration": "3:00",
+      "resistance": 22,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Valley",
+      "duration": "4:00",
+      "resistance": 30,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Foothills 2",
+      "duration": "4:00",
+      "resistance": 38,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Climb 2",
+      "duration": "4:00",
+      "resistance": 45,
+      "position": "seated",
+      "cadence": 72
+    },
+    {
+      "label": "Steeper 2",
+      "duration": "4:00",
+      "resistance": 50,
+      "position": "seated",
+      "cadence": 68
+    },
+    {
+      "label": "Summit 2",
+      "duration": "2:00",
+      "resistance": 57,
+      "position": "standing",
+      "cadence": 62
+    },
+    {
+      "label": "Peak 2",
+      "duration": "1:30",
+      "resistance": 60,
+      "position": "standing",
+      "cadence": 58
+    },
+    {
+      "label": "Descent 2",
+      "duration": "3:00",
+      "resistance": 28,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Easy Spin",
+      "duration": "3:30",
+      "resistance": 22,
+      "position": "seated",
+      "cadence": 88
+    },
+    {
+      "label": "Cool-down",
+      "duration": "5:00",
+      "resistance": 15,
+      "position": "seated",
+      "cadence": 80
+    }
+  ]
+}
