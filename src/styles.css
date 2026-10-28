@@ -773,3 +773,11 @@ button.danger {
   font-size: 0.9rem;
   color: var(--good);
 }
+
+.workout-picker {
+  align-items: center;
+}
+
+.picker-label {
+  font-weight: 700;
+}
