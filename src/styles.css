@@ -689,3 +689,14 @@ button.danger {
     grid-row: 2;
   }
 }
+
+/* Ad banner (editor only) */
+.ad-banner {
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+/* AdSense marks slots it couldn't fill; don't leave an empty gap. */
+.ad-banner ins.adsbygoogle[data-ad-status="unfilled"] {
+  display: none !important;
+}
