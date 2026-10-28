@@ -1,46 +1,102 @@
+import { useState } from "react";
 import { DAYS, DAY_NAMES, findScheduled, todayKey, workoutKey, type DayKey, type Schedule } from "../schedule";
 import { formatDuration, totalDuration, type Workout } from "../workout";
 import { resistanceColor } from "./colors";
+import { ProfileChart } from "./ProfileChart";
 
 const peak = (w: Workout) => Math.max(0, ...w.sets.map((s) => s.resistance));
 
-/** Today's planned ride, with a button to start it. */
-export function TodayBar({
+/** The app's home screen: today's ride, a button to start it, and the next few days. */
+export function TodayView({
   schedule,
   workouts,
   onRide,
+  onOpenWeek,
 }: {
   schedule: Schedule;
   workouts: Workout[];
   onRide: (w: Workout) => void;
+  onOpenWeek: () => void;
 }) {
-  const day = todayKey();
+  const now = new Date();
+  const day = todayKey(now);
   const key = schedule[day];
   const workout = findScheduled(workouts, key);
+  const sorted = [...workouts].sort((a, b) => a.name.localeCompare(b.name));
+  const [pick, setPick] = useState("");
+  const picked = workouts.find((w) => w.id === pick) ?? sorted[0];
+  const upcoming = [1, 2, 3].map((n) => DAYS[(DAYS.indexOf(day) + n) % 7]);
 
   return (
-    <section className="card today">
-      <div className="today-text">
-        <span className="today-day">Today · {DAY_NAMES[day]}</span>
+    <>
+      <section className="card today">
+        <div className="today-date">
+          {now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
+        </div>
         {workout ? (
-          <strong>
-            {workout.name} <span className="muted">· {formatDuration(totalDuration(workout.sets))}</span>
-          </strong>
-        ) : key ? (
-          <strong>Planned ride not found on this device</strong>
+          <>
+            <h2 className="today-name">{workout.name}</h2>
+            <div className="today-meta">
+              {formatDuration(totalDuration(workout.sets))} · {workout.sets.length} sets · peak{" "}
+              <span className="week-peak" style={{ background: resistanceColor(peak(workout)) }}>
+                {peak(workout)}
+              </span>
+            </div>
+            <ProfileChart sets={workout.sets} height={110} />
+            <button type="button" className="primary today-start" onClick={() => onRide(workout)}>
+              ▶ Start ride
+            </button>
+          </>
         ) : (
-          <strong>Rest day 😌</strong>
+          <>
+            <h2 className="today-name">{key ? "Today's ride isn't on this device" : "Rest day 😌"}</h2>
+            {sorted.length > 0 && (
+              <div className="today-anyway">
+                <span className="muted">{key ? "Pick something else:" : "Feel like riding anyway?"}</span>
+                <select aria-label="Ride to start" value={picked?.id} onChange={(e) => setPick(e.target.value)}>
+                  {sorted.map((w) => (
+                    <option key={w.id} value={w.id}>
+                      {w.name} · {formatDuration(totalDuration(w.sets))}
+                    </option>
+                  ))}
+                </select>
+                <button type="button" className="primary" onClick={() => picked && onRide(picked)}>
+                  ▶ Ride
+                </button>
+              </div>
+            )}
+          </>
         )}
-      </div>
-      {workout && (
-        <button type="button" className="primary" onClick={() => onRide(workout)}>
-          ▶ Ride
+      </section>
+
+      <section className="card coming-up">
+        <strong>Coming up</strong>
+        <ul>
+          {upcoming.map((d, i) => {
+            const w = findScheduled(workouts, schedule[d]);
+            return (
+              <li key={d}>
+                <span className="week-day">{i === 0 ? "Tomorrow" : DAY_NAMES[d]}</span>
+                <span className="coming-ride">{w ? w.name : schedule[d] ? "(missing ride)" : "Rest"}</span>
+                <span className="week-meta">
+                  {w && (
+                    <>
+                      {formatDuration(totalDuration(w.sets))}
+                      <span className="week-peak" style={{ background: resistanceColor(peak(w)) }}>
+                        {peak(w)}
+                      </span>
+                    </>
+                  )}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+        <button type="button" className="link-button" onClick={onOpenWeek}>
+          See the whole week →
         </button>
-      )}
-      <a href="#schedule" className="today-edit">
-        Edit week
-      </a>
-    </section>
+      </section>
+    </>
   );
 }
 
@@ -62,7 +118,7 @@ export function WeekSchedule({
   return (
     <section className="card week" id="schedule">
       <strong>This week</strong>
-      <p className="muted">Pick a ride for each day. Today's ride shows at the top of the app.</p>
+      <p className="muted">Pick a ride for each day. Today's ride is on the Today tab.</p>
       <ul className="week-days">
         {DAYS.map((day) => {
           const key = schedule[day];

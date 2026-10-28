@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { AdBanner } from "./components/AdBanner";
+import { LibraryCard } from "./components/LibraryCard";
 import { ProfileChart } from "./components/ProfileChart";
 import { RideMode } from "./components/RideMode";
 import { SetList } from "./components/SetList";
-import { TodayBar, WeekSchedule } from "./components/Schedule";
+import { TodayView, WeekSchedule } from "./components/Schedule";
 import { SyncBadge, SyncPanel } from "./components/SyncPanel";
 import { configFileName, parseConfigFile, toConfigFile } from "./configFile";
+import { isLibraryRepo, mergeLibrary, type LibraryFile } from "./library";
 import { suggestedSchedule, type DayKey, type ScheduleState } from "./schedule";
-import { loadDeleted, loadSchedule, loadWorkouts, saveDeleted, saveSchedule, saveWorkouts } from "./storage";
+import { builtinWorkouts, loadDeleted, loadSchedule, loadWorkouts, saveDeleted, saveSchedule, saveWorkouts } from "./storage";
 import type { SyncState } from "./sync/sync";
 import { useSync } from "./sync/useSync";
 import {
@@ -33,6 +35,22 @@ function downloadJson(fileName: string, data: unknown) {
   URL.revokeObjectURL(url);
 }
 
+type Tab = "today" | "workouts" | "week";
+const TABS: [Tab, string][] = [
+  ["today", "Today"],
+  ["workouts", "Workouts"],
+  ["week", "Week"],
+];
+
+/** The tab named in the address (#today, #workouts, #week), plus older anchors. */
+function tabFromHash(): { tab: Tab; anchor?: string } {
+  const h = location.hash.slice(1);
+  if (h === "workouts" || h === "week" || h === "today") return { tab: h };
+  if (h === "sync") return { tab: "workouts", anchor: "sync" };
+  if (h === "schedule") return { tab: "week" };
+  return { tab: "today" };
+}
+
 /** A new, unsynced copy of a workout. */
 function copyOf(w: Workout, name: string): Workout {
   return {
@@ -52,6 +70,23 @@ export default function App() {
   const { workouts } = library;
   const [activeId, setActiveId] = useState<string | null>(() => workouts[0]?.id ?? null);
   const [riding, setRiding] = useState(false);
+  const [tab, setTab] = useState<Tab>(() => tabFromHash().tab);
+
+  // Tabs live in the address so the back button moves between them.
+  useEffect(() => {
+    const onHash = () => {
+      const { tab: next, anchor } = tabFromHash();
+      setTab(next);
+      // After the tab has rendered, jump to the section the link points at.
+      if (anchor) setTimeout(() => document.getElementById(anchor)?.scrollIntoView(), 50);
+      else window.scrollTo(0, 0);
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  const goTab = (next: Tab) => {
+    if (location.hash !== `#${next}`) location.hash = next;
+  };
   // The copy created by changing resistance during the current ride, if any.
   const [rideCopyId, setRideCopyId] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -80,6 +115,19 @@ export default function App() {
     setSchedule((s) => ({ ...s, dirty: true, schedule: { ...s.schedule, [day]: key } }));
 
   const sync = useSync(library, setLibrary, schedule, setSchedule);
+
+  // "Check for new rides" in the ride library.
+  const libraryRef = useRef(library);
+  libraryRef.current = library;
+  const updateFromLibrary = (files: LibraryFile[]) => {
+    const builtinOrigins = new Map(builtinWorkouts().map((w) => [w.id, w.origin!]));
+    const merge = (lib: SyncState) => mergeLibrary(lib.workouts, files, new Set(lib.deleted.map((t) => t.file)), builtinOrigins);
+    // Merge into the newest workouts when applying, in case of edits during the download.
+    setLibrary((lib) => ({ ...lib, workouts: merge(lib).workouts }));
+    return merge(libraryRef.current);
+  };
+  // Synced to the library's own repo: sync already keeps these rides up to date.
+  const showLibrary = !(sync.config && isLibraryRepo(sync.config.owner, sync.config.repo));
 
   const setWorkouts = useCallback(
     (update: (ws: Workout[]) => Workout[]) => setLibrary((lib) => ({ ...lib, workouts: update(lib.workouts) })),
@@ -216,90 +264,116 @@ export default function App() {
       <header className="app-header">
         <h1>Spin Workout Builder</h1>
         <SyncBadge sync={sync} />
-        <div className="workout-picker">
-          <select value={active.id} onChange={(e) => setActiveId(e.target.value)} aria-label="Workout">
-            {workouts.map((w) => (
-              <option key={w.id} value={w.id}>
-                {w.name}
-              </option>
-            ))}
-          </select>
-          <button type="button" onClick={newWorkout}>
-            + New
-          </button>
-          <button type="button" onClick={() => addWorkouts([copyOf(active, `${active.name} (copy)`)])}>
-            Duplicate
-          </button>
-          <button type="button" className="danger" onClick={deleteWorkout}>
-            Delete
-          </button>
-        </div>
       </header>
 
-      <TodayBar schedule={schedule.schedule} workouts={workouts} onRide={rideWorkout} />
-
-      <section className="card">
-        <input
-          className="workout-name"
-          value={active.name}
-          aria-label="Workout name"
-          onChange={(e) => patchActive({ name: e.target.value })}
-        />
-        {active.file && sync.config && <div className="muted file-name">{active.file}</div>}
-        <div className="stats">
-          <div>
-            <span>Total time</span>
-            <strong>{formatDuration(stats.total)}</strong>
-          </div>
-          <div>
-            <span>Sets</span>
-            <strong>{active.sets.length}</strong>
-          </div>
-          <div>
-            <span>Avg resistance</span>
-            <strong>{Math.round(stats.avg)}</strong>
-          </div>
-          <div>
-            <span>Peak</span>
-            <strong>{stats.peak}</strong>
-          </div>
-        </div>
-        <ProfileChart sets={active.sets} />
-        <button type="button" className="primary ride-button" disabled={active.sets.length === 0} onClick={startRide}>
-          ▶ Ride this workout
-        </button>
-      </section>
-
-      <section className="card">
-        <SetList sets={active.sets} onChange={setSets} />
-        <button type="button" className="add-set" onClick={addSet}>
-          + Add set
-        </button>
-      </section>
-
-      <WeekSchedule
-        schedule={schedule.schedule}
-        workouts={workouts}
-        onChange={setDay}
-        onUseSuggested={() => setSchedule((s) => ({ ...s, dirty: true, schedule: suggestedSchedule(workouts) }))}
-      />
-
-      <SyncPanel sync={sync} />
-
-      <section className="card files">
-        <div>
-          <strong>Workout files</strong>
-          <p className="muted">
-            Save this workout as a <code>.json</code> config file, or load workout files from your device.
-          </p>
-        </div>
-        <div className="files-actions">
-          <button type="button" onClick={() => downloadJson(configFileName(active), toConfigFile(active))}>
-            ⬇ Export this workout
+      <nav className="tabs" role="tablist" aria-label="Sections">
+        {TABS.map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={tab === id}
+            className={tab === id ? "tab active" : "tab"}
+            onClick={() => goTab(id)}
+          >
+            {label}
           </button>
-          {importButton}
-        </div>
-      </section>
+        ))}
+      </nav>
+
+      {tab === "today" && (
+        <TodayView schedule={schedule.schedule} workouts={workouts} onRide={rideWorkout} onOpenWeek={() => goTab("week")} />
+      )}
+
+      {tab === "week" && (
+        <WeekSchedule
+          schedule={schedule.schedule}
+          workouts={workouts}
+          onChange={setDay}
+          onUseSuggested={() => setSchedule((s) => ({ ...s, dirty: true, schedule: suggestedSchedule(workouts) }))}
+        />
+      )}
+
+      {tab === "workouts" && (
+        <>
+          <div className="workout-picker">
+            <select value={active.id} onChange={(e) => setActiveId(e.target.value)} aria-label="Workout">
+              {workouts.map((w) => (
+                <option key={w.id} value={w.id}>
+                  {w.name}
+                </option>
+              ))}
+            </select>
+            <button type="button" onClick={newWorkout}>
+              + New
+            </button>
+            <button type="button" onClick={() => addWorkouts([copyOf(active, `${active.name} (copy)`)])}>
+              Duplicate
+            </button>
+            <button type="button" className="danger" onClick={deleteWorkout}>
+              Delete
+            </button>
+          </div>
+
+          <section className="card">
+            <input
+              className="workout-name"
+              value={active.name}
+              aria-label="Workout name"
+              onChange={(e) => patchActive({ name: e.target.value })}
+            />
+            {active.file && sync.config && <div className="muted file-name">{active.file}</div>}
+            <div className="stats">
+              <div>
+                <span>Total time</span>
+                <strong>{formatDuration(stats.total)}</strong>
+              </div>
+              <div>
+                <span>Sets</span>
+                <strong>{active.sets.length}</strong>
+              </div>
+              <div>
+                <span>Avg resistance</span>
+                <strong>{Math.round(stats.avg)}</strong>
+              </div>
+              <div>
+                <span>Peak</span>
+                <strong>{stats.peak}</strong>
+              </div>
+            </div>
+            <ProfileChart sets={active.sets} />
+            <button type="button" className="primary ride-button" disabled={active.sets.length === 0} onClick={startRide}>
+              ▶ Ride this workout
+            </button>
+          </section>
+
+          <section className="card">
+            <SetList sets={active.sets} onChange={setSets} />
+            <button type="button" className="add-set" onClick={addSet}>
+              + Add set
+            </button>
+          </section>
+
+          {showLibrary && <LibraryCard onUpdate={updateFromLibrary} />}
+
+          <section className="card files">
+            <div>
+              <strong>Workout files</strong>
+              <p className="muted">
+                Save this workout as a <code>.json</code> config file, or load workout files from your device.
+              </p>
+            </div>
+            <div className="files-actions">
+              <button type="button" onClick={() => downloadJson(configFileName(active), toConfigFile(active))}>
+                ⬇ Export this workout
+              </button>
+              {importButton}
+            </div>
+          </section>
+
+          <SyncPanel sync={sync} />
+        </>
+      )}
 
       <AdBanner />
     </main>

@@ -251,7 +251,7 @@ button.danger {
   text-align: center;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .set-row {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
@@ -575,42 +575,114 @@ button.danger {
   justify-content: center;
 }
 
-/* Weekly schedule */
-.today {
+/* Tabs */
+.tabs {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  border-left: 6px solid var(--accent);
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
 }
 
-.today-text {
+.tab {
   flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  border: none;
+  background: transparent;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--muted);
 }
 
-.today-day {
-  font-size: 0.75rem;
+.tab.active {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.workout-picker {
+  margin-bottom: 16px;
+}
+
+/* Today */
+.today {
+  border-top: 6px solid var(--accent);
+}
+
+.today-date {
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--muted);
 }
 
-.today-text strong {
-  font-size: 1.15rem;
+.today-name {
+  margin: 4px 0 6px;
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-weight: 700;
 }
 
-.today .primary {
-  padding: 10px 20px;
+.today-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
-.today-edit,
-.week a {
+.today-start {
+  width: 100%;
+  margin-top: 14px;
+  padding: 16px;
+  font-size: 1.25rem;
+}
+
+.today-anyway {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.today-anyway select {
+  flex: 1;
+  min-width: 180px;
+}
+
+.coming-up ul {
+  list-style: none;
+  margin: 10px 0 6px;
+  padding: 0;
+}
+
+.coming-up li {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.coming-up li:last-child {
+  border-bottom: none;
+}
+
+.coming-ride {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-button {
+  border: none;
+  background: none;
+  padding: 4px 0;
   color: var(--accent);
-  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .week p {
@@ -699,4 +771,10 @@ button.danger {
 /* AdSense marks slots it couldn't fill; don't leave an empty gap. */
 .ad-banner ins.adsbygoogle[data-ad-status="unfilled"] {
   display: none !important;
+}
+
+.library-result {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: var(--good);
 }

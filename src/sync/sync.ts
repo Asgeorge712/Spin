@@ -41,6 +41,7 @@ export function conflictName(name: string, when: Date): string {
  * - New local workouts are written as new files; local edits update their file.
  * - Files changed remotely replace the unedited local copy; new remote files are added.
  * - Files deleted remotely are removed locally (unless edited here, then re-created).
+ *   With `uploadUnsynced`, a workout that was never synced is uploaded instead.
  * - Local deletions (tombstones) delete the remote file, unless it changed remotely.
  * - If both sides changed a file, the remote version wins and the local version is
  *   saved as a separate "(conflict …)" workout, so nothing is lost.
@@ -49,7 +50,21 @@ export function conflictName(name: string, when: Date): string {
  * `errors`, and losing the connection or token stops early with `stopped`; either
  * way, what got through is kept and the rest is left as it was, to retry later.
  */
-export async function syncWorkouts(repo: WorkoutRepo, state: SyncState, now = new Date()): Promise<SyncOutcome> {
+export interface SyncOptions {
+  /**
+   * Upload workouts that have a file name but were never synced (built-in or
+   * library rides) when the repo doesn't have them. Off for the library's own
+   * repo, where a missing file means it was deleted there.
+   */
+  uploadUnsynced?: boolean;
+}
+
+export async function syncWorkouts(
+  repo: WorkoutRepo,
+  state: SyncState,
+  now = new Date(),
+  { uploadUnsynced = false }: SyncOptions = {},
+): Promise<SyncOutcome> {
   const remoteFiles = (await repo.list()).filter((f) => f.name.toLowerCase().endsWith(".json"));
   const remote = new Map(remoteFiles.map((f) => [f.name, f.sha]));
   const taken = new Set<string>([...remote.keys(), ...state.workouts.flatMap((w) => (w.file ? [w.file] : []))]);
@@ -110,7 +125,7 @@ export async function syncWorkouts(repo: WorkoutRepo, state: SyncState, now = ne
     const remoteSha = remote.get(w.file);
     const file = w.file;
 
-    if (w.dirty) {
+    if (w.dirty || (uploadUnsynced && remoteSha === undefined && w.sha === undefined)) {
       if (remoteSha === undefined || remoteSha === w.sha) {
         const ok = await attempt(`Saving "${w.name}"`, async () => {
           const sha = await repo.write(file, serializeWorkout(w), remoteSha, `Update workout "${w.name}"`);

@@ -143,6 +143,21 @@ describe("syncWorkouts", () => {
     expect(repo.names()).toEqual(["edited.json"]);
   });
 
+  it("uploads never-synced rides to your own repo, but treats them as deleted in the library repo", async () => {
+    const builtIn = { ...workout("Climb"), file: "climb.json" }; // Has a file name, never synced.
+
+    const own = new FakeRepo();
+    const out = await syncWorkouts(own, state([builtIn]), new Date(), { uploadUnsynced: true });
+    expect(own.names()).toEqual(["climb.json"]);
+    expect(out.workouts[0]).toMatchObject({ file: "climb.json", dirty: false });
+    expect(out.workouts[0].sha).toBeTruthy();
+
+    const library = new FakeRepo();
+    const out2 = await syncWorkouts(library, state([builtIn]));
+    expect(library.names()).toEqual([]);
+    expect(out2.workouts).toEqual([]);
+  });
+
   it("keeps what got through when the connection drops partway", async () => {
     const repo = new FakeRepo();
     repo.offlineAfter = 2; // list + one write succeed.

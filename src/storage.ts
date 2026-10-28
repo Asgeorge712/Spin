@@ -1,4 +1,5 @@
 import { parseConfigFile, toConfigFile } from "./configFile";
+import { fingerprint } from "./library";
 import { suggestedSchedule, parseSchedule, type ScheduleState } from "./schedule";
 import type { SyncConfig } from "./sync/github";
 import { normalizeSet, type Tombstone, type Workout } from "./workout";
@@ -19,7 +20,8 @@ export function builtinWorkouts(): Workout[] {
       const file = path.split("/").pop()!.replace(/\.json$/, "");
       try {
         // Matches the file name in the synced folder, so the first sync links them up.
-        return [{ ...parseConfigFile(data, file), id: `file:${file}`, file: `${file}.json` }];
+        const w = parseConfigFile(data, file);
+        return [{ ...w, id: `file:${file}`, file: `${file}.json`, origin: fingerprint(w) }];
       } catch (err) {
         console.error(`Skipping invalid workout file ${path}:`, err);
         return [];

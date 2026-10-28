@@ -26,6 +26,12 @@ export interface Workout {
   sha?: string;
   /** Changed on this device since the last sync. */
   dirty?: boolean;
+  /**
+   * Fingerprint of the version of the library ride this came from (a built-in,
+   * or "Check for new rides"). If the workout no longer matches it, it has
+   * been edited here and library updates leave it alone.
+   */
+  origin?: string;
 }
 
 /** A synced workout file that was deleted on this device and must be removed remotely. */
