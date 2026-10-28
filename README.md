@@ -78,6 +78,12 @@ first time it loads. After that, the app opens and runs with no connection. On a
 use "Add to Home Screen" to install it like an app. Offline mode needs the app to be served over HTTPS (or from
 `localhost`), and it is turned off in `npm run dev`. Use `npm run build && npm run preview` to try it.
 
+## Ads
+
+`src/components/AdBanner.tsx` shows a Google AdSense banner (ad unit "Spin app banner") at the bottom of the editor. It
+only runs on `spin.paulgeorge.com`, never in ride mode, and not when offline; an unfilled slot collapses to nothing.
+Keep AdSense **Auto ads** off for this site so Google doesn't place ads elsewhere, such as during a ride.
+
 ## Hosting on GitHub Pages
 
 `.github/workflows/deploy.yml` builds the app, runs the tests, and publishes it to GitHub Pages on every push

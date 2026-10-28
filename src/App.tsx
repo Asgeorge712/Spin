@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { AdBanner } from "./components/AdBanner";
 import { ProfileChart } from "./components/ProfileChart";
 import { RideMode } from "./components/RideMode";
 import { SetList } from "./components/SetList";
@@ -299,6 +300,8 @@ export default function App() {
           {importButton}
         </div>
       </section>
+
+      <AdBanner />
     </main>
   );
 }
