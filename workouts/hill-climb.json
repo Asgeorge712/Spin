@@ -83,13 +83,13 @@
     },
     {
       "label": "Cool-down",
-      "duration": "4:00",
+      "duration": "2:00",
       "resistance": 30,
       "position": "seated"
     },
     {
       "label": "Cool-down",
-      "duration": "4:00",
+      "duration": "2:00",
       "resistance": 25,
       "position": "seated"
     }
