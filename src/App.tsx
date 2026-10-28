@@ -322,7 +322,6 @@ export default function App() {
               aria-label="Workout name"
               onChange={(e) => patchActive({ name: e.target.value })}
             />
-            {active.file && sync.config && <div className="muted file-name">{active.file}</div>}
             <div className="stats">
               <div>
                 <span>Total time</span>
