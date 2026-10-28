@@ -202,7 +202,7 @@ export default function App() {
     return (
       <main className="app">
         <header className="app-header">
-          <h1>Spin Workout Builder</h1>
+          <h1>Spin Studio</h1>
           <SyncBadge sync={sync} />
         </header>
         <section className="card empty-library">
@@ -282,7 +282,7 @@ export default function App() {
   return (
     <main className="app">
       <header className="app-header">
-        <h1>Spin Workout Builder</h1>
+        <h1>Spin Studio</h1>
         <SyncBadge sync={sync} />
       </header>
 

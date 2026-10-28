@@ -1,4 +1,4 @@
-# Spin
+# Spin Studio
 
 A web app for building and riding spin bike workouts. It works with no internet connection.
 
