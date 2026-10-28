@@ -1,0 +1,273 @@
+{
+  "format": "spin-workout",
+  "version": 1,
+  "name": "30/30s",
+  "sets": [
+    {
+      "label": "Warm-up 1",
+      "duration": "2:00",
+      "resistance": 20,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Warm-up 2",
+      "duration": "2:00",
+      "resistance": 28,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Warm-up 3",
+      "duration": "1:00",
+      "resistance": 38,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 1 On 1",
+      "duration": "0:30",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 1 Off 1",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 1 On 2",
+      "duration": "0:30",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 1 Off 2",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 1 On 3",
+      "duration": "0:30",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 1 Off 3",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 1 On 4",
+      "duration": "0:30",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 1 Off 4",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 1 On 5",
+      "duration": "0:30",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 1 Off 5",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 1 On 6",
+      "duration": "0:30",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 1 Off 6",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 1 On 7",
+      "duration": "0:30",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 1 Off 7",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 1 On 8",
+      "duration": "0:30",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 1 Off 8",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Between Sets",
+      "duration": "5:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 2 On 1",
+      "duration": "0:30",
+      "resistance": 55,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 2 Off 1",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 2 On 2",
+      "duration": "0:30",
+      "resistance": 55,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 2 Off 2",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 2 On 3",
+      "duration": "0:30",
+      "resistance": 55,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 2 Off 3",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 2 On 4",
+      "duration": "0:30",
+      "resistance": 55,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 2 Off 4",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 2 On 5",
+      "duration": "0:30",
+      "resistance": 55,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 2 Off 5",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 2 On 6",
+      "duration": "0:30",
+      "resistance": 55,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 2 Off 6",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 2 On 7",
+      "duration": "0:30",
+      "resistance": 55,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 2 Off 7",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Set 2 On 8",
+      "duration": "0:30",
+      "resistance": 55,
+      "position": "seated",
+      "cadence": 95
+    },
+    {
+      "label": "Set 2 Off 8",
+      "duration": "0:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Cool-down 1",
+      "duration": "2:00",
+      "resistance": 22,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Cool-down 2",
+      "duration": "2:00",
+      "resistance": 15,
+      "position": "seated",
+      "cadence": 80
+    }
+  ]
+}

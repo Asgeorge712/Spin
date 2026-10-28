@@ -1,0 +1,140 @@
+{
+  "format": "spin-workout",
+  "version": 1,
+  "name": "Over-Unders 45",
+  "sets": [
+    {
+      "label": "Warm-up 1",
+      "duration": "2:00",
+      "resistance": 20,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Warm-up 2",
+      "duration": "2:00",
+      "resistance": 28,
+      "position": "seated",
+      "cadence": 88
+    },
+    {
+      "label": "Warm-up 3",
+      "duration": "1:00",
+      "resistance": 36,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Under 1",
+      "duration": "4:00",
+      "resistance": 44,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Over 1",
+      "duration": "1:00",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Easy 1",
+      "duration": "3:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Under 2",
+      "duration": "4:00",
+      "resistance": 44,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Over 2",
+      "duration": "1:00",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Easy 2",
+      "duration": "3:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Under 3",
+      "duration": "4:00",
+      "resistance": 44,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Over 3",
+      "duration": "1:00",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Easy 3",
+      "duration": "3:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Under 4",
+      "duration": "4:00",
+      "resistance": 44,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Over 4",
+      "duration": "1:00",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Easy 4",
+      "duration": "3:00",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 90
+    },
+    {
+      "label": "Under 5",
+      "duration": "4:00",
+      "resistance": 44,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Over 5",
+      "duration": "1:00",
+      "resistance": 52,
+      "position": "seated",
+      "cadence": 80
+    },
+    {
+      "label": "Cool-down 1",
+      "duration": "1:30",
+      "resistance": 22,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Cool-down 2",
+      "duration": "1:30",
+      "resistance": 15,
+      "position": "seated",
+      "cadence": 80
+    }
+  ]
+}

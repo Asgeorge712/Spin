@@ -1,0 +1,91 @@
+{
+  "format": "spin-workout",
+  "version": 1,
+  "name": "Endurance 45",
+  "sets": [
+    {
+      "label": "Ramp 1",
+      "duration": "2:30",
+      "resistance": 20,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Ramp 2",
+      "duration": "2:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 88
+    },
+    {
+      "label": "Steady 1",
+      "duration": "6:00",
+      "resistance": 30,
+      "position": "seated",
+      "cadence": 88
+    },
+    {
+      "label": "High Cadence 1",
+      "duration": "2:00",
+      "resistance": 28,
+      "position": "seated",
+      "cadence": 100
+    },
+    {
+      "label": "Steady 2",
+      "duration": "6:00",
+      "resistance": 32,
+      "position": "seated",
+      "cadence": 88
+    },
+    {
+      "label": "High Cadence 2",
+      "duration": "2:00",
+      "resistance": 28,
+      "position": "seated",
+      "cadence": 100
+    },
+    {
+      "label": "Steady 3",
+      "duration": "6:00",
+      "resistance": 34,
+      "position": "seated",
+      "cadence": 86
+    },
+    {
+      "label": "High Cadence 3",
+      "duration": "2:00",
+      "resistance": 30,
+      "position": "seated",
+      "cadence": 100
+    },
+    {
+      "label": "Steady 4",
+      "duration": "6:00",
+      "resistance": 35,
+      "position": "seated",
+      "cadence": 86
+    },
+    {
+      "label": "Steady 5",
+      "duration": "5:00",
+      "resistance": 32,
+      "position": "seated",
+      "cadence": 88
+    },
+    {
+      "label": "Cool-down 1",
+      "duration": "2:30",
+      "resistance": 25,
+      "position": "seated",
+      "cadence": 85
+    },
+    {
+      "label": "Cool-down 2",
+      "duration": "2:30",
+      "resistance": 18,
+      "position": "seated",
+      "cadence": 80
+    }
+  ]
+}
