@@ -1,4 +1,5 @@
 import { parseConfigFile, toConfigFile } from "./configFile";
+import { suggestedSchedule, parseSchedule, type ScheduleState } from "./schedule";
 import type { SyncConfig } from "./sync/github";
 import { normalizeSet, type Tombstone, type Workout } from "./workout";
 
@@ -6,6 +7,7 @@ const WORKOUTS_KEY = "spin.workouts.v2";
 const SEEN_BUILTINS_KEY = "spin.seenBuiltins.v1";
 const DELETED_KEY = "spin.deleted.v1";
 const SYNC_KEY = "spin.sync.v1";
+const SCHEDULE_KEY = "spin.schedule.v1";
 
 /** Workout config files shipped with the app, from the repo's workouts/ folder. */
 const builtinFiles = import.meta.glob<unknown>("../workouts/*.json", { eager: true, import: "default" });
@@ -64,7 +66,8 @@ function linkLegacyBuiltin(w: Workout, builtins: Workout[]): Workout {
 /**
  * Loads the workouts saved on this device. Built-in workout files that this
  * device hasn't seen before are added, so new files in workouts/ show up after
- * an update, while built-ins the user deleted stay deleted.
+ * an update, while built-ins the user deleted stay deleted. A built-in whose
+ * file is already here (because sync downloaded it) isn't added a second time.
  */
 export function loadWorkouts(): Workout[] {
   const stored = readJson(WORKOUTS_KEY);
@@ -75,11 +78,16 @@ export function loadWorkouts(): Workout[] {
 
   const seenRaw = readJson(SEEN_BUILTINS_KEY);
   const seen = new Set(Array.isArray(seenRaw) ? seenRaw.filter((x) => typeof x === "string") : []);
-  const fresh = builtins.filter((w) => !seen.has(w.id));
-  if (fresh.length > 0) {
-    writeJson(SEEN_BUILTINS_KEY, [...seen, ...fresh.map((w) => w.id)]);
+  const unseen = builtins.filter((w) => !seen.has(w.id));
+  if (unseen.length > 0) {
+    writeJson(SEEN_BUILTINS_KEY, [...seen, ...unseen.map((w) => w.id)]);
   }
-  return [...saved, ...fresh];
+  const deletedRaw = readJson(DELETED_KEY);
+  const known = new Set([
+    ...saved.map((w) => w.file),
+    ...(Array.isArray(deletedRaw) ? deletedRaw.map((t) => (t as { file?: unknown })?.file) : []),
+  ]);
+  return [...saved, ...unseen.filter((w) => !known.has(w.file))];
 }
 
 export function saveWorkouts(workouts: Workout[]): void {
@@ -110,4 +118,26 @@ export function saveSyncConfig(config: SyncConfig | null): void {
       // Ignore.
     }
   }
+}
+
+/** The weekly schedule on this device, or the suggested week the first time. */
+export function loadSchedule(workouts: Workout[]): ScheduleState {
+  const raw = readJson(SCHEDULE_KEY) as { schedule?: unknown; sha?: unknown; dirty?: unknown } | null;
+  try {
+    if (raw?.schedule) {
+      return {
+        schedule: parseSchedule({ days: raw.schedule }),
+        sha: typeof raw.sha === "string" ? raw.sha : undefined,
+        dirty: raw.dirty === true,
+      };
+    }
+  } catch {
+    // Fall through to the suggestion.
+  }
+  // Not marked as changed, so a schedule already synced from another device wins.
+  return { schedule: suggestedSchedule(workouts) };
+}
+
+export function saveSchedule(state: ScheduleState): void {
+  writeJson(SCHEDULE_KEY, state);
 }
