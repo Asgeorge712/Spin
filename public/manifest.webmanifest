@@ -1,11 +1,30 @@
 {
-  "name": "Spin Workout Builder",
-  "short_name": "Spin",
-  "description": "Build and ride spin bike workouts, online or off.",
+  "name": "Spin Studio",
+  "short_name": "Spin Studio",
+  "description": "Design your own spin bike workouts and ride them, online or off.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#111317",
   "theme_color": "#ff5a1f",
-  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
 }
